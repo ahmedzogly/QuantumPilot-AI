@@ -52,12 +52,15 @@ services:
       - key: NODE_ENV
         value: production
 
+  - type: redis
+    name: quantumpilot-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    region: oregon
+
 databases:
   - name: quantumpilot-postgres
     databaseName: quantumpilot_db
     user: quantumpilot
     plan: starter
-
-  - name: quantumpilot-redis
-    plan: free
-    maxmemoryPolicy: allkeys-lru
+    region: oregon
