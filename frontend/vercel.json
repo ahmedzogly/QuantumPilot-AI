@@ -1,16 +1,5 @@
 {
   "framework": "nextjs",
   "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "env": {
-    "NEXT_PUBLIC_API_URL": {
-      "description": "Backend API URL - Render or Local",
-      "value": "https://quantumpilot-backend.onrender.com/api/v1"
-    }
-  },
-  "regions": ["iad1"],
-  "github": {
-    "silent": true
-  }
+  "outputDirectory": ".next"
 }
