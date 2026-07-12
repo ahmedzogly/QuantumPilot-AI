@@ -1,0 +1,85 @@
+# Render.com Deployment - QuantumPilot AI - Full Production
+# One-click deploy: https://render.com/deploy?repo=https://github.com/ahmedzogly/QuantumPilot-AI
+
+services:
+  # Backend FastAPI + NeuralUCB + Mitigation Factory + SpaceWeather Live
+  - type: web
+    name: quantumpilot-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: backend
+    plan: starter
+    region: oregon
+    branch: main
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: quantumpilot-postgres
+          property: host
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: quantumpilot-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: quantumpilot-postgres
+          property: password
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: quantumpilot-postgres
+          property: database
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: quantumpilot-redis
+          property: connectionString
+      - key: RABBITMQ_URL
+        sync: false
+      - key: IBM_TOKEN
+        sync: false
+      - key: IBM_CRN
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHONPATH
+        value: /app
+
+  # Frontend Next.js Dashboard - 6 Recharts + CopilotChat + SpaceWeatherChart LIVE
+  - type: web
+    name: quantumpilot-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/out
+    # For Next.js static export, need next.config.js with output: 'export'
+    # Alternative: use Node service for SSR
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://quantumpilot-backend.onrender.com/api/v1
+
+  # Alternative Frontend as Node for SSR (Recharts needs SSR disabled but better as Node)
+  - type: web
+    name: quantumpilot-frontend-ssr
+    env: node
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
+    plan: starter
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://quantumpilot-backend.onrender.com/api/v1
+      - key: NODE_ENV
+        value: production
+
+databases:
+  - name: quantumpilot-postgres
+    databaseName: quantumpilot_db
+    user: quantumpilot
+    plan: starter
+    postgresVersion: "15"
+
+  - name: quantumpilot-redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
