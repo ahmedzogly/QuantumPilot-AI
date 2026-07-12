@@ -1,0 +1,37 @@
+[
+  {
+    "method": "none",
+    "mitigated": 0.85,
+    "overhead": 1.0
+  },
+  {
+    "method": "linear",
+    "mitigated": 0.916,
+    "overhead": 5.0
+  },
+  {
+    "method": "richardson",
+    "mitigated": 0.93,
+    "overhead": 5.0
+  },
+  {
+    "method": "exp",
+    "mitigated": 0.9262,
+    "overhead": 5.0
+  },
+  {
+    "method": "s_zne",
+    "mitigated": 0.916,
+    "overhead": 1.2
+  },
+  {
+    "method": "nnas",
+    "mitigated": 1.53,
+    "overhead": 2.0
+  },
+  {
+    "method": "transformer",
+    "mitigated": 0.8929,
+    "overhead": 3.0
+  }
+]

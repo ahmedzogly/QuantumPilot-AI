@@ -1,0 +1,14 @@
+{
+  "total_rows_analyzed": 312,
+  "T1_mean_all": 38517018.712923065,
+  "T1_std_all": 79720236.69214906,
+  "correlation_kp_T1": -0.1968212424955621,
+  "correlation_neutron_T1": 0.07986764470563464,
+  "high_kp_count": 10,
+  "backends": [
+    "ibm_marrakesh",
+    "ibm_torino",
+    "ibm_kingston",
+    "ibm_fez"
+  ]
+}

@@ -1,0 +1,159 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: quantumpilot-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-quantumpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-quantumpilot}
+      POSTGRES_DB: ${POSTGRES_DB:-quantumpilot_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quantumpilot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - quantumpilot-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: quantumpilot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - quantumpilot-net
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: quantumpilot-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"  # Management UI http://localhost:15672
+    volumes:
+      - rabbitdata:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - quantumpilot-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: quantumpilot-backend
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=${POSTGRES_USER:-quantumpilot}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-quantumpilot}
+      - POSTGRES_DB=${POSTGRES_DB:-quantumpilot_db}
+      - REDIS_URL=redis://redis:6379/0
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
+      - IBM_TOKEN=${IBM_TOKEN}
+      - IBM_CRN=${IBM_CRN}
+      - HF_TOKEN=${HF_TOKEN}
+      - SECRET_KEY=${SECRET_KEY:-prod-secret-change-me}
+      - PYTHONPATH=/app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./datasets:/app/datasets:ro
+      - ./models:/app/models
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - quantumpilot-net
+    restart: unless-stopped
+
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: quantumpilot-celery-worker
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_URL=redis://redis:6379/0
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
+      - IBM_TOKEN=${IBM_TOKEN}
+      - IBM_CRN=${IBM_CRN}
+    volumes:
+      - ./datasets:/app/datasets:ro
+      - ./models:/app/models
+      - ./logs:/app/logs
+    command: celery -A app.core.celery_app worker --loglevel=info --concurrency=2
+    depends_on:
+      - redis
+      - rabbitmq
+      - postgres
+    networks:
+      - quantumpilot-net
+    restart: unless-stopped
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: quantumpilot-celery-beat
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
+    volumes:
+      - ./datasets:/app/datasets:ro
+      - ./logs:/app/logs
+    command: celery -A app.core.celery_app beat --loglevel=info --schedule=/tmp/celerybeat-schedule
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - quantumpilot-net
+    restart: unless-stopped
+    # This is the Space Weather background job every 10 min
+    # Fetches NOAA kp_index + neutron_flux + solar_zenith live for NeuralUCB 22-D
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: quantumpilot-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - quantumpilot-net
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  rabbitdata:
+
+networks:
+  quantumpilot-net:
+    driver: bridge

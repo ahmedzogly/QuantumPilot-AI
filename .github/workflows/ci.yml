@@ -1,0 +1,174 @@
+name: QuantumPilot AI CI - Production & Research Grade
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.11 (for Mitiq compatibility)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black isort ruff
+          pip install -r backend/requirements.txt
+      
+      - name: Check Black formatting
+        run: black --check backend/ --diff
+      
+      - name: Check isort
+        run: isort --check-only backend/
+      
+      - name: Ruff lint
+        run: ruff check backend/
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint-and-format
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: quantumpilot
+          POSTGRES_PASSWORD: quantumpilot
+          POSTGRES_DB: quantumpilot_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 3s
+          --health-retries 5
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      
+      - name: Install dependencies
+        run: |
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-cov httpx
+      
+      - name: Run unit tests
+        env:
+          DATABASE_URL: postgresql://quantumpilot:quantumpilot@localhost:5432/quantumpilot_test
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          cd backend
+          pytest tests/unit -v --cov=app --cov-report=xml
+      
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://quantumpilot:quantumpilot@localhost:5432/quantumpilot_test
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          cd backend
+          pytest tests/integration -v
+      
+      - name: Test FastAPI endpoints
+        run: |
+          cd backend
+          python -m pytest tests/ -k "test_api" -v
+
+  docker-build-test:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build backend Docker (Python 3.11 for Mitiq)
+        run: |
+          docker build -f backend/Dockerfile -t quantumpilot-backend:test ./backend
+      
+      - name: Build frontend Docker
+        run: |
+          docker build -f frontend/Dockerfile -t quantumpilot-frontend:test ./frontend
+      
+      - name: Test docker-compose.prod.yml config
+        run: |
+          docker-compose -f docker-compose.prod.yml config
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Bandit security scan
+        run: |
+          pip install bandit
+          bandit -r backend/app -f json -o bandit-report.json || true
+      
+      - name: Check for secrets in code
+        uses: gitleaks/gitleaks-action@v2
+
+  docs-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check required docs exist (20 files)
+        run: |
+          echo "Checking 20 required docs..."
+          test -f README.md
+          test -f docs/INSTALL.md
+          test -f docs/ARCHITECTURE.md
+          test -f docs/ROADMAP.md
+          test -f docs/CHANGELOG.md
+          test -f docs/CONTRIBUTING.md
+          test -f docs/API.md
+          test -f docs/DATABASE.md
+          test -f docs/DEPLOYMENT.md
+          test -f docs/SECURITY.md
+          test -f docs/TESTING.md
+          test -f docs/AI_ENGINE.md
+          test -f docs/NEURALUCB.md
+          test -f docs/IBM_RUNTIME.md
+          test -f docs/ERROR_MITIGATION.md
+          test -f docs/DECISION_ENGINE.md
+          test -f docs/GRANITE_SIZE.md
+          test -f docs/project/Tasks.md
+          test -f docs/project/Completed.md
+          test -f docs/architecture/MINDMAP_FULL.md
+          echo "All 20+ docs exist!"
+
+  research-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validate datasets exist
+        run: |
+          test -f datasets/calibration_drift/drift_50k.parquet
+          test -f datasets/clifford_training/clifford_training_100.json
+          test -f models/neuralucb/reward_net_deep.pt
+          echo "Research datasets validated!"
+      
+      - name: Validate live data fetch
+        run: |
+          python -c "from backend.app.infrastructure.external.spaceweather_service import SpaceWeatherService; s=SpaceWeatherService(); print(s.fetch_kp_index())"
