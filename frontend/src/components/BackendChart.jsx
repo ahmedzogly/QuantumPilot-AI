@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 export default function BackendChart() {
-  const [data, setData] = useState<any[]>([
+  const [data] = useState([
     {name:'ibm_fez', T1:135.6, T2:106.3, RO:2.23, CZ:3.33},
     {name:'ibm_marrakesh', T1:170.9, T2:100.4, RO:2.73, CZ:4.52},
     {name:'ibm_kingston', T1:231, T2:159.7, RO:2.18, CZ:2.92}

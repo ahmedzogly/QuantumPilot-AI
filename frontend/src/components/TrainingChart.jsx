@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 export default function TrainingChart() {
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState([])
   useEffect(() => {
     fetch('/training_history.json').then(r=>r.json()).then(setData)
   }, [])
@@ -16,7 +16,7 @@ export default function TrainingChart() {
           <YAxis domain={[0,0.4]} />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="train_loss" stroke="#8884d8" name="Train Loss 0.3224→0.0028" />
+          <Line type="monotone" dataKey="train_loss" stroke="#8884d8" name="Train Loss 0.3224 to 0.0028" />
           <Line type="monotone" dataKey="val_loss" stroke="#82ca9d" name="Val Loss" />
         </LineChart>
       </ResponsiveContainer>

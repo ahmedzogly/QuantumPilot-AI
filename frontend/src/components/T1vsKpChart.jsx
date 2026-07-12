@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 export default function T1vsKpChart() {
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState([])
   useEffect(() => {
-    fetch('/t1_vs_kp.json').then(r=>r.json()).then(d=>setData(d.filter((x:any)=>x.T1 && x.kp)))
+    fetch('/t1_vs_kp.json').then(r=>r.json()).then(d=>setData(d.filter(x=>x.T1 && x.kp)))
   }, [])
   return (
     <div style={{ width: '100%', height: 300 }}>

@@ -1,9 +1,8 @@
-
 import { useState } from 'react'
 
 export default function CopilotChat() {
   const [intent, setIntent] = useState("")
-  const [plan, setPlan] = useState<any>(null)
+  const [plan, setPlan] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const examples = [
@@ -12,23 +11,20 @@ export default function CopilotChat() {
     "نفذ بأسرع وقت",
     "تجنب التنفيذ وقت العاصفة الشمسية",
     "Execute with lowest cost",
-    "Choose backend with fidelity >95%"
+    "Choose backend with fidelity high"
   ]
 
   const handlePlan = async () => {
     if (!intent) return
     setLoading(true)
     try {
-      // Mock call - in production fetch from /api/v1/copilot/plan
-      // For demo, simulate parsing
       const lower = intent.toLowerCase()
       let type = "balanced"
       if (lower.includes("تكلفة") || lower.includes("cost") || lower.includes("cheap")) type = "cheapest"
-      else if (lower.includes("دقة") || lower.includes("fidelity") || lower.includes("95%")) type = "highest_fidelity"
+      else if (lower.includes("دقة") || lower.includes("fidelity") || lower.includes("95")) type = "highest_fidelity"
       else if (lower.includes("أسرع") || lower.includes("fast")) type = "fastest"
       else if (lower.includes("طقس") || lower.includes("space") || lower.includes("عاصفة") || lower.includes("kp")) type = "avoid_space_weather"
       
-      // Simulate plan
       setPlan({
         intent: { type, original_text: intent },
         plan: {
@@ -53,8 +49,8 @@ export default function CopilotChat() {
 
   return (
     <div style={{ background: '#0f172a', padding: 15, borderRadius: 8, border: '2px solid #8b5cf6' }}>
-      <h3>🤖 Quantum Copilot - Intent Agent (9.5/10 Feature)</h3>
-      <p style={{ fontSize: 12, color: '#aaa' }}>اكتب نية طبيعية بالعربي أو الإنجليزي - مثال: "نفذ بأقل تكلفة" أو "Fidelity &gt;95%" - والـ AI يبني خطة تنفيذ تلقائياً ويشرح</p>
+      <h3>Quantum Copilot - Intent Agent (9.5/10 Feature)</h3>
+      <p style={{ fontSize: 12, color: '#aaa' }}>اكتب نية طبيعية بالعربي أو الإنجليزي - مثال: نفذ بأقل تكلفة أو Fidelity عالي</p>
       
       <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', margin: '10px 0' }}>
         {examples.map(ex => (
@@ -66,7 +62,7 @@ export default function CopilotChat() {
         <input 
           value={intent} 
           onChange={e => setIntent(e.target.value)} 
-          placeholder="مثال: نفذ بأقل تكلفة أو Choose backend with fidelity >95%"
+          placeholder="مثال: نفذ بأقل تكلفة"
           style={{ flex: 1, padding: 10, borderRadius: 5, background: '#1a1a1a', color: 'white', border: '1px solid #555' }}
         />
         <button onClick={handlePlan} disabled={loading} style={{ padding: '10px 20px', background: '#8b5cf6', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>
@@ -76,13 +72,12 @@ export default function CopilotChat() {
 
       {plan && (
         <div style={{ marginTop: 15, background: '#1e293b', padding: 15, borderRadius: 8 }}>
-          <h4>✅ Execution Plan Auto-Generated</h4>
-          <p><strong>Intent:</strong> {plan.intent.type} - "{plan.intent.original_text}"</p>
+          <h4>Execution Plan Auto-Generated</h4>
+          <p><strong>Intent:</strong> {plan.intent.type} - {plan.intent.original_text}</p>
           <p><strong>Backend:</strong> {plan.plan.backend_name} | <strong>Opt:</strong> {plan.plan.optimization_level} | <strong>Mitigation:</strong> {plan.plan.mitigation_strategy} | <strong>Shots:</strong> {plan.plan.shots}</p>
           <p><strong>Expected Fidelity:</strong> {(plan.plan.expected_fidelity*100).toFixed(1)}% | <strong>Weights:</strong> {JSON.stringify(plan.plan.reward_weights)}</p>
-          <p style={{ background: '#111', padding: 10, borderRadius: 5, marginTop: 10 }}><strong>Explanation AR:</strong> {plan.plan.explanation_ar}</p>
-          <p style={{ fontSize: 12, color: '#888', marginTop: 10 }}>Space Weather: Kp={plan.space_weather.kp_index} {plan.space_weather.risk_level} - Cosmic Ray {plan.space_weather.neutron_flux} counts/min - Novel Correlation T1 vs kp -0.197 p=0.00047</p>
-          <p style={{ fontSize: 11, color: '#00ff88' }}>Novelty: First platform to parse Arabic intent + space weather aware + explainable + NeuralUCB 22-D (Backend 8 + Q-LEAR 7 + Env 2 kp,temp)</p>
+          <p style={{ background: '#111', padding: 10, borderRadius: 5, marginTop: 10 }}><strong>Explanation:</strong> {plan.plan.explanation_ar}</p>
+          <p style={{ fontSize: 12, color: '#888', marginTop: 10 }}>Space Weather: Kp={plan.space_weather.kp_index} {plan.space_weather.risk_level} - Cosmic Ray {plan.space_weather.neutron_flux} - Novel T1 vs kp -0.197</p>
         </div>
       )}
     </div>

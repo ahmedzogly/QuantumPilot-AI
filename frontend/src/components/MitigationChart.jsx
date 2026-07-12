@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 export default function MitigationChart() {
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState([])
   useEffect(() => {
     fetch('/mitigation_comparison.json').then(r=>r.json()).then(setData)
   }, [])

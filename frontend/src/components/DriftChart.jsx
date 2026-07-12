@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 export default function DriftChart() {
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState([])
   useEffect(() => {
     fetch('/drift_timeseries.json').then(r=>r.json()).then(d=>setData(d.slice(0,50)))
   }, [])

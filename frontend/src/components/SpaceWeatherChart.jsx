@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 
 export default function SpaceWeatherChart() {
-  const [data, setData] = useState<any>(null)
+  const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Try live API, fallback to mock
     fetch('/api/v1/spaceweather/live')
       .then(r => r.json())
       .then(d => {
@@ -13,7 +12,6 @@ export default function SpaceWeatherChart() {
         setLoading(false)
       })
       .catch(() => {
-        // Fallback mock from our live fetch today
         setData({
           kp_index: 2.0,
           estimated_kp: 2.0,
@@ -39,7 +37,7 @@ export default function SpaceWeatherChart() {
 
   return (
     <div style={{ background: '#0f172a', padding: 15, borderRadius: 8, border: '2px solid #00ff88' }}>
-      <h3>🌞 Live Space Weather - NOAA + Cosmic Ray Strength (قوة الأشعة الكونية)</h3>
+      <h3>Live Space Weather - NOAA + Cosmic Ray Strength</h3>
       <p style={{ fontSize: 12, color: '#888' }}>Source: {data.kp_source} Status: {data.kp_status} Time: {data.kp_time_tag}</p>
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 10 }}>
@@ -51,27 +49,22 @@ export default function SpaceWeatherChart() {
         </div>
         <div style={{ background: '#1e293b', padding: 10, borderRadius: 5 }}>
           <strong>Neutron Flux</strong><br/>
-          <span style={{ fontSize: 20 }}>{data.neutron_flux?.toFixed(1)}</span> {data.neutron_unit}<br/>
-          <small>Cosmic Ray Strength: {data.cosmic_ray_strength?.toFixed(3)}</small><br/>
+          <span style={{ fontSize: 20 }}>{data.neutron_flux?.toFixed ? data.neutron_flux.toFixed(1) : data.neutron_flux}</span> {data.neutron_unit}<br/>
+          <small>Cosmic Ray Strength: {data.cosmic_ray_strength?.toFixed ? data.cosmic_ray_strength.toFixed(3) : data.cosmic_ray_strength}</small><br/>
           <small style={{ color: '#aaa' }}>Source: {data.neutron_source}</small>
         </div>
         <div style={{ background: '#1e293b', padding: 10, borderRadius: 5 }}>
           <strong>Solar Zenith</strong><br/>
-          <span style={{ fontSize: 20 }}>{data.solar_zenith_deg?.toFixed(1)}°</span><br/>
+          <span style={{ fontSize: 20 }}>{data.solar_zenith_deg?.toFixed ? data.solar_zenith_deg.toFixed(1) : data.solar_zenith_deg}°</span><br/>
           <small>Temp: {data.temperature_c}°C (NY)</small><br/>
           <small>IBM Yorktown 41.27, -73.78</small>
         </div>
       </div>
 
       <div style={{ marginTop: 10, padding: 10, background: '#1a1a1a', borderRadius: 5 }}>
-        <strong>NeuralUCB Integration:</strong> kp_norm={data.kp_norm?.toFixed(3)} temp_norm={data.temp_norm?.toFixed(3)} → Last 2 dims of 22-D context vector<br/>
+        <strong>NeuralUCB Integration:</strong> kp_norm={data.kp_norm?.toFixed ? data.kp_norm.toFixed(3) : data.kp_norm} temp_norm={data.temp_norm?.toFixed ? data.temp_norm.toFixed(3) : data.temp_norm} → Last 2 dims of 22-D context vector<br/>
         <small style={{ color: '#888' }}>{data.correlation_note}</small><br/>
         <small style={{ color: '#00ff88' }}>{data.recommendation}</small>
-      </div>
-
-      <div style={{ marginTop: 10, fontSize: 11, color: '#666' }}>
-        <p>🔬 Novelty: First quantum platform to use live kp_index & neutron_flux as features. Correlation T1 vs kp -0.197 p=0.00047 significant from 8M rows.</p>
-        <p>APIs: NOAA SWPC https://services.swpc.noaa.gov/json/planetary_k_index_1m.json (live 1-min) + Open-Meteo + NMDB Oulu (fallback Forbush model)</p>
       </div>
     </div>
   )
