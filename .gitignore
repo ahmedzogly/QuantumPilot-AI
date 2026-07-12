@@ -48,3 +48,6 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+datasets/szne/repo/
+datasets/**/*.git
+**/datasets/**/repo/.git
