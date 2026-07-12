@@ -3,8 +3,8 @@
 ## Live Data Pulled Today (Verified 2026-07-12)
 
 ### IBM Quantum Account
-- **CRN:** crn:v1:bluemix:public:quantum-computing:us-east:a/abd845cfd9bc4a37898488294645cbc3:cdf67559-abcb-4675-8486-cf736ffe4e3c:: (Name: DIGI, Region us-east, State active, Created 2026-07-11)
-- **Token:** 9ac9duxenBehY3CqCjHEJ8Eivbk4J0T6ZvU5Tcn-zcLo (IBM Cloud API Key, used for IAM token exchange)
+- **CRN:** crn:v1:bluemix:public:quantum-computing:us-east:a/ACCOUNT_ID_PLACEHOLDER:INSTANCE_ID_PLACEHOLDER:: (Name: DIGI, Region us-east, State active, Created 2026-07-11)
+- **Token:** IBM_TOKEN_PLACEHOLDER (IBM Cloud API Key, used for IAM token exchange)
 - **CRN Discovery:** Via resource-controller.cloud.ibm.com/v2/resource_instances -> 1 instance found DIGI
 - **IAM Exchange:** https://iam.cloud.ibm.com/identity/token grant_type apikey -> access_token with IBMid, email, account bss
 

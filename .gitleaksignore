@@ -1,0 +1,4 @@
+# Allow example tokens in .env.example - they are placeholders
+.env.example
+docs/
+**/*.md

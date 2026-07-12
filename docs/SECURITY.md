@@ -2,13 +2,13 @@
 
 ## Secrets Management
 - **Never commit**: IBM_TOKEN, IBM_CRN, HF_TOKEN, SECRET_KEY - use .env.example + .env (gitignored)
-- Current IBM_TOKEN in example is real token we used today CRN DIGI: `9ac9duxenBehY3CqCjHEJ8Eivbk4J0T6ZvU5Tcn-zcLo` - should be revoked after demo, included in .env.example for testing only
+- Current IBM_TOKEN in example is real token we used today CRN DIGI: `IBM_TOKEN_PLACEHOLDER` - should be revoked after demo, included in .env.example for testing only
 - JWT: SECRET_KEY 32 chars, HS256, expire 8 days
 - Password: passlib bcrypt
 
 ## Vulnerabilities Found & Fixed
 - IBM_TOKEN exposed in logs earlier - now using env var IBM_TOKEN from .env, cleaned /tmp/*.py files
-- CRN exposed: crn:v1:bluemix:public:quantum-computing:us-east:a/abd845cfd9bc4a37898488294645cbc3:cdf67559... - account ID abd845cf... - should be masked in prod logs
+- CRN exposed: crn:v1:bluemix:public:quantum-computing:us-east:a/ACCOUNT_ID_PLACEHOLDER:cdf67559... - account ID abd845cf... - should be masked in prod logs
 - Mitiq fails on Python 3.13 ImpImporter -> fixed with Docker Python 3.11
 - Nan in T1/T2 backend causes JSON compliance error -> fixed with imputation 100us/80us
 
