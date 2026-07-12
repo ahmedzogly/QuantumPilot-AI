@@ -56,6 +56,7 @@ services:
     name: quantumpilot-redis
     plan: free
     maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
     region: oregon
 
 databases:
