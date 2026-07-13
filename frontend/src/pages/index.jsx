@@ -14,57 +14,51 @@ function DashboardContent() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundImage: 'url(/background.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed',
+      backgroundColor: '#0a0a0a',
       position: 'relative'
     }}>
-      {/* Main Background: 40% as requested - 40% visibility = 60% dark overlay */}
+      {/* Main background - fixed, no overlap */}
       <div style={{
-        position: 'absolute',
+        position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        background: 'linear-gradient(135deg, rgba(10, 14, 26, 0.60) 0%, rgba(10, 10, 15, 0.60) 100%)',
+        backgroundImage: 'url(/background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        opacity: 0.15,
         zIndex: 0
       }} />
+      
+      {/* Gradient overlay for readability */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'linear-gradient(180deg, rgba(10,14,26,0.85) 0%, rgba(18,20,31,0.90) 100%)',
+        zIndex: 1
+      }} />
 
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      <div style={{ position: 'relative', zIndex: 2 }}>
         <Header />
         
         <main style={{ padding: '24px 32px', maxWidth: 1400, margin: '0 auto' }}>
-          {/* Hero Section: 40% opacity logo watermark - as requested */}
+          {/* Hero - Clean, no overlapping watermark */}
           <div style={{
-            background: 'rgba(18, 20, 31, 0.6)',
+            background: 'rgba(18, 20, 31, 0.8)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(30, 34, 53, 0.5)',
+            border: '1px solid rgba(30, 34, 53, 0.6)',
             borderRadius: 12,
-            padding: 32,
+            padding: '40px 32px',
             marginBottom: 24,
-            textAlign: 'center',
-            position: 'relative',
-            overflow: 'hidden'
+            textAlign: 'center'
           }}>
-            <div style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              opacity: 0.40,
-              zIndex: 0
-            }}>
-              <img src="/logo.png" alt="background logo" style={{ width: 350, height: 350, objectFit: 'contain', filter: 'drop-shadow(0 0 30px rgba(15, 98, 254, 0.5))' }} />
-            </div>
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <img src="/logo.png" alt="QuantumPilot AI" style={{ width: 90, height: 90, marginBottom: 16, filter: 'drop-shadow(0 0 20px rgba(15, 98, 254, 0.5))' }} />
-              <h2 style={{ fontSize: 26, fontWeight: 600, color: 'white', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>QuantumPilot AI Platform</h2>
-              <p style={{ fontSize: 14, color: '#8d8d8d', margin: 0 }}>Live IBM Quantum • 8.04M Records • NeuralUCB 8847 Contexts • Space Weather Aware • 40% Opacity Professional</p>
-              <div style={{ marginTop: 12, fontSize: 11, color: '#0f62fe', background: 'rgba(15, 98, 254, 0.1)', display: 'inline-block', padding: '4px 10px', borderRadius: 12, border: '1px solid rgba(15, 98, 254, 0.2)' }}>
-                40% Opacity • Enterprise Level • IBM/Microsoft/Google Inspired
-              </div>
-            </div>
+            <img src="/logo.png" alt="QuantumPilot AI" style={{ width: 64, height: 64, marginBottom: 16 }} />
+            <h2 style={{ fontSize: 28, fontWeight: 600, color: 'white', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>QuantumPilot AI Platform</h2>
+            <p style={{ fontSize: 14, color: '#8d8d8d', margin: 0 }}>Live IBM Quantum • 8.04M Records • NeuralUCB 8847 Contexts • Space Weather Aware</p>
           </div>
 
           <div style={{ marginBottom: 24 }}>
@@ -73,7 +67,7 @@ function DashboardContent() {
 
           <div style={{ marginBottom: 24 }}>
             <div style={{
-              background: 'rgba(18, 20, 31, 0.75)',
+              background: 'rgba(18, 20, 31, 0.85)',
               backdropFilter: 'blur(20px)',
               border: '1px solid #1e2235',
               borderRadius: 8,
@@ -85,7 +79,7 @@ function DashboardContent() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
             <div style={{
-              background: 'rgba(18, 20, 31, 0.75)',
+              background: 'rgba(18, 20, 31, 0.85)',
               backdropFilter: 'blur(20px)',
               border: '1px solid #1e2235',
               borderRadius: 8,
@@ -94,7 +88,7 @@ function DashboardContent() {
               <BackendChart />
             </div>
             <div style={{
-              background: 'rgba(18, 20, 31, 0.75)',
+              background: 'rgba(18, 20, 31, 0.85)',
               backdropFilter: 'blur(20px)',
               border: '1px solid #1e2235',
               borderRadius: 8,
@@ -106,7 +100,7 @@ function DashboardContent() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
             <div style={{
-              background: 'rgba(18, 20, 31, 0.75)',
+              background: 'rgba(18, 20, 31, 0.85)',
               backdropFilter: 'blur(20px)',
               border: '1px solid #1e2235',
               borderRadius: 8,
@@ -115,7 +109,7 @@ function DashboardContent() {
               <DriftChart />
             </div>
             <div style={{
-              background: 'rgba(18, 20, 31, 0.75)',
+              background: 'rgba(18, 20, 31, 0.85)',
               backdropFilter: 'blur(20px)',
               border: '1px solid #1e2235',
               borderRadius: 8,
@@ -126,7 +120,7 @@ function DashboardContent() {
           </div>
 
           <div style={{
-            background: 'rgba(18, 20, 31, 0.75)',
+            background: 'rgba(18, 20, 31, 0.85)',
             backdropFilter: 'blur(20px)',
             border: '1px solid #1e2235',
             borderRadius: 8,
@@ -137,17 +131,16 @@ function DashboardContent() {
           </div>
 
           <div style={{
-            borderTop: '1px solid rgba(30, 34, 53, 0.5)',
+            borderTop: '1px solid #1e2235',
             paddingTop: 16,
             marginTop: 32,
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
             fontSize: 11,
             color: '#6f6f6f'
           }}>
-            <div>Background 40% Visibility (60% Dark Overlay) • Hero Logo 40% Opacity • Enterprise Level • As Requested 40%</div>
-            <div>github.com/ahmedzogly/QuantumPilot-AI • Apache 2.0</div>
+            <div>QuantumPilot AI • IBM Quantum Live • Professional Enterprise UI • No Overlap</div>
+            <div>github.com/ahmedzogly/QuantumPilot-AI</div>
           </div>
         </main>
       </div>
