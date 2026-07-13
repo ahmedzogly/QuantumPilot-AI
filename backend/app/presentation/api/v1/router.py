@@ -216,3 +216,28 @@ def make_decision(req: CircuitRequest):
         expected_fidelity=0.87,  # placeholder from proxy
         confidence=float(max(scores)) if scores else 0.5
     )
+
+# Additional endpoints for full lifecycle
+@router.get("/projects")
+def list_projects():
+    from ....application.use_cases.project_management import ProjectManagementUseCase
+    uc = ProjectManagementUseCase()
+    return uc.list_projects()
+
+@router.post("/execute")
+def execute_circuit(circuit_id: str = "test-circuit", backend_name: str = "ibm_kingston", opt_level: int = 1, mitigation: str = "s_zne", shots: int = 1024):
+    from ....application.use_cases.runtime_execution import RuntimeExecutionUseCase
+    from ....infrastructure.external.spaceweather_service import SpaceWeatherService
+    sw = SpaceWeatherService()
+    space_weather = sw.fetch_all()
+    uc = RuntimeExecutionUseCase(spaceweather_service=sw)
+    decision = {"backend_name": backend_name, "optimization_level": opt_level, "mitigation_strategy": mitigation, "shots": shots}
+    result = uc.execute(circuit_id, decision)
+    return result
+
+@router.get("/analytics/knowledge-graph")
+def knowledge_graph():
+    from ....application.use_cases.learning_engine import LearningEngine
+    engine = LearningEngine()
+    return engine.get_knowledge_graph_stats()
+
