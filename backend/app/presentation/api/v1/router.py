@@ -241,3 +241,33 @@ def knowledge_graph():
     engine = LearningEngine()
     return engine.get_knowledge_graph_stats()
 
+
+# Real IBM Quantum Execution - Execute Button
+@router.post("/execute/real")
+def execute_real_circuit(req: dict):
+    """
+    Real Execute Button - Connects to IBM Quantum
+    Body: {qasm, qiskit_code, backend_name, optimization_level, shots, mitigation_strategy}
+    """
+    from ....infrastructure.qiskit.execution_service import IBMExecutionService
+    service = IBMExecutionService()
+    qasm = req.get("qasm")
+    qiskit_code = req.get("qiskit_code")
+    backend_name = req.get("backend_name", "ibm_kingston")
+    opt_level = req.get("optimization_level", 1)
+    shots = req.get("shots", 1024)
+    mitigation = req.get("mitigation_strategy", "s_zne")
+    
+    result = service.execute_circuit(
+        qasm_str=qasm,
+        qiskit_code=qiskit_code,
+        backend_name=backend_name,
+        optimization_level=opt_level,
+        shots=shots,
+        mitigation=mitigation
+    )
+    return result
+
+@router.get("/execute/{execution_id}")
+def get_execution_status(execution_id: str):
+    return {"execution_id": execution_id, "status": "Use POST /execute/real to execute on IBM Quantum fez 135.6us, kingston 231us BEST"}
