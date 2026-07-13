@@ -1,17 +1,22 @@
 import { useState } from 'react'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function CopilotChat() {
+  const { t, locale } = useLanguage()
   const [intent, setIntent] = useState("")
   const [plan, setPlan] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  const examples = [
+  const examples = locale === 'ar' ? [
     "نفذ بأقل تكلفة",
-    "اختر الجهاز الذي يحقق Fidelity أعلى من 95%",
+    "اختر جهاز بدقة أعلى من 95%",
     "نفذ بأسرع وقت",
-    "تجنب التنفيذ وقت العاصفة الشمسية",
+    "تجنب العاصفة الشمسية"
+  ] : [
     "Execute with lowest cost",
-    "Choose backend with fidelity high"
+    "Choose high fidelity backend",
+    "Fastest execution",
+    "Avoid space weather storm"
   ]
 
   const handlePlan = async () => {
@@ -33,13 +38,12 @@ export default function CopilotChat() {
           mitigation_strategy: type==="fastest" ? "none" : "s_zne",
           shots: type==="highest_fidelity" ? 8192 : 1024,
           expected_fidelity: type==="highest_fidelity" ? 0.97 : 0.92,
-          explanation_ar: type==="cheapest" ? "اخترت أقل تكلفة: S-ZNE 1.2x بدل 5x توفير 76% + 1024 shots + backend أقل queue" : 
-                         type==="highest_fidelity" ? "اخترت أعلى دقة 95%: ibm_kingston T1 231us + opt 3 + pec + 8192 shots" :
-                         type==="avoid_space_weather" ? "حالة الطقس هادئة kp=2.0 آمن للتنفيذ S-ZNE" :
-                         "اخترت التوازن الأمثل: Fidelity 50% + Cost 20% + Queue 20%",
+          explanation: type==="cheapest" ? (locale==='ar' ? "تم اختيار أقل تكلفة: S-ZNE بتكلفة 1.2x بدلاً من 5x، توفير 76%." : "Selected lowest cost: S-ZNE 1.2x vs 5x, 76% saving.") : 
+                       type==="highest_fidelity" ? (locale==='ar' ? "تم اختيار أعلى دقة: ibm_kingston T1 231us، تحسين مستوى 3." : "Selected highest fidelity: ibm_kingston T1 231us, opt level 3.") :
+                       (locale==='ar' ? "تم اختيار التوازن الأمثل." : "Selected balanced optimal."),
           reward_weights: { fidelity: type==="highest_fidelity"?0.7:0.5, cost: type==="cheapest"?0.5:0.2 }
         },
-        space_weather: { kp_index: 2.0, risk_level: "Unsettled", neutron_flux: 94.6 }
+        space_weather: { kp_index: 2.0, risk_level: locale==='ar' ? "هادئ نسبياً" : "Unsettled", neutron_flux: 94.6 }
       })
     } catch (e) {
       console.error(e)
@@ -48,36 +52,45 @@ export default function CopilotChat() {
   }
 
   return (
-    <div style={{ background: '#0f172a', padding: 15, borderRadius: 8, border: '2px solid #8b5cf6' }}>
-      <h3>Quantum Copilot - Intent Agent (9.5/10 Feature)</h3>
-      <p style={{ fontSize: 12, color: '#aaa' }}>اكتب نية طبيعية بالعربي أو الإنجليزي - مثال: نفذ بأقل تكلفة أو Fidelity عالي</p>
+    <div style={{
+      background: '#12141f',
+      border: '1px solid #1e2235',
+      borderRadius: 8,
+      padding: 20
+    }}>
+      <div style={{ marginBottom: 16 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#f4f4f4', margin: 0 }}>{t('copilot_title')}</h3>
+        <p style={{ fontSize: 12, color: '#8d8d8d', margin: '4px 0 0 0' }}>{t('copilot_subtitle')}</p>
+      </div>
       
-      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', margin: '10px 0' }}>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
         {examples.map(ex => (
-          <button key={ex} onClick={() => setIntent(ex)} style={{ fontSize: 11, padding: '4px 8px', borderRadius: 12, background: '#1e293b', color: 'white', border: '1px solid #555', cursor: 'pointer' }}>{ex}</button>
+          <button key={ex} onClick={() => setIntent(ex)} style={{ fontSize: 11, padding: '5px 10px', borderRadius: 16, background: '#1a1a2e', color: '#c6c6c6', border: '1px solid #2a2a40', cursor: 'pointer' }}>{ex}</button>
         ))}
       </div>
 
-      <div style={{ display: 'flex', gap: 10 }}>
+      <div style={{ display: 'flex', gap: 8 }}>
         <input 
           value={intent} 
           onChange={e => setIntent(e.target.value)} 
-          placeholder="مثال: نفذ بأقل تكلفة"
-          style={{ flex: 1, padding: 10, borderRadius: 5, background: '#1a1a1a', color: 'white', border: '1px solid #555' }}
+          placeholder={t('copilot_placeholder')}
+          style={{ flex: 1, padding: '10px 12px', borderRadius: 6, background: '#0f111a', color: '#f4f4f4', border: '1px solid #1e2235', fontSize: 13 }}
         />
-        <button onClick={handlePlan} disabled={loading} style={{ padding: '10px 20px', background: '#8b5cf6', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>
-          {loading ? "..." : "Build Plan"}
+        <button onClick={handlePlan} disabled={loading} style={{ padding: '10px 16px', background: '#0f62fe', color: 'white', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
+          {loading ? "..." : t('build_plan')}
         </button>
       </div>
 
       {plan && (
-        <div style={{ marginTop: 15, background: '#1e293b', padding: 15, borderRadius: 8 }}>
-          <h4>Execution Plan Auto-Generated</h4>
-          <p><strong>Intent:</strong> {plan.intent.type} - {plan.intent.original_text}</p>
-          <p><strong>Backend:</strong> {plan.plan.backend_name} | <strong>Opt:</strong> {plan.plan.optimization_level} | <strong>Mitigation:</strong> {plan.plan.mitigation_strategy} | <strong>Shots:</strong> {plan.plan.shots}</p>
-          <p><strong>Expected Fidelity:</strong> {(plan.plan.expected_fidelity*100).toFixed(1)}% | <strong>Weights:</strong> {JSON.stringify(plan.plan.reward_weights)}</p>
-          <p style={{ background: '#111', padding: 10, borderRadius: 5, marginTop: 10 }}><strong>Explanation:</strong> {plan.plan.explanation_ar}</p>
-          <p style={{ fontSize: 12, color: '#888', marginTop: 10 }}>Space Weather: Kp={plan.space_weather.kp_index} {plan.space_weather.risk_level} - Cosmic Ray {plan.space_weather.neutron_flux} - Novel T1 vs kp -0.197</p>
+        <div style={{ marginTop: 16, background: '#0f111a', border: '1px solid #1e2235', padding: 14, borderRadius: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, color: '#8d8d8d', textTransform: 'uppercase' }}>{t('plan')}</span>
+            <span style={{ fontSize: 11, color: '#24a148', background: 'rgba(36,161,72,0.1)', padding: '2px 8px', borderRadius: 10 }}>{plan.intent.type}</span>
+          </div>
+          <div style={{ fontSize: 13, color: '#c6c6c6', lineHeight: 1.5 }}>
+            <div>{t('backend')}: {plan.plan.backend_name} • {t('optimization')}: {plan.plan.optimization_level} • {t('mitigation_strategy')}: {plan.plan.mitigation_strategy} • {t('shots')}: {plan.plan.shots}</div>
+            <div style={{ marginTop: 8, padding: 10, background: '#12141f', borderRadius: 4, fontSize: 12, color: '#8d8d8d' }}>{plan.plan.explanation}</div>
+          </div>
         </div>
       )}
     </div>
