@@ -10,6 +10,7 @@ const T1vsKpChart = dynamic(() => import('../components/T1vsKpChart'), { ssr: fa
 const MitigationChart = dynamic(() => import('../components/MitigationChart'), { ssr: false })
 const CopilotChat = dynamic(() => import('../components/CopilotChat'), { ssr: false })
 const CircuitInput = dynamic(() => import('../components/CircuitInput'), { ssr: false })
+const UncertaintyChart = dynamic(() => import('../components/UncertaintyChart'), { ssr: false })
 const CostDashboard = dynamic(() => import('../components/CostDashboard'), { ssr: false })
 
 function DashboardContent() {
