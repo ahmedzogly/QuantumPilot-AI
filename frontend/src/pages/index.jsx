@@ -10,6 +10,7 @@ const T1vsKpChart = dynamic(() => import('../components/T1vsKpChart'), { ssr: fa
 const MitigationChart = dynamic(() => import('../components/MitigationChart'), { ssr: false })
 const CopilotChat = dynamic(() => import('../components/CopilotChat'), { ssr: false })
 const CircuitInput = dynamic(() => import('../components/CircuitInput'), { ssr: false })
+const CostDashboard = dynamic(() => import('../components/CostDashboard'), { ssr: false })
 
 function DashboardContent() {
   return (
@@ -38,13 +39,21 @@ function DashboardContent() {
             background: '#12141f',
             border: '1px solid #1e2235',
             borderRadius: 12,
-            padding: '48px 32px',
+            padding: '32px',
             marginBottom: 24,
             textAlign: 'center'
           }}>
-            <img src="/logo.png" alt="QuantumPilot AI Logo" style={{ width: 72, height: 72, marginBottom: 20, display: 'block', marginLeft: 'auto', marginRight: 'auto', borderRadius: '20px' }} />
-            <h2 style={{ fontSize: 28, fontWeight: 600, color: 'white', margin: '0 0 8px 0' }}>QuantumPilot AI Platform</h2>
-            <p style={{ fontSize: 14, color: '#8d8d8d', margin: 0 }}>Live IBM Quantum • 8.04M Records • NeuralUCB 8847 Contexts • Space Weather Aware • Cards 30% Transparency</p>
+            <img src="/logo.png" alt="QuantumPilot AI Logo" style={{ width: 64, height: 64, marginBottom: 16, borderRadius: '20px' }} />
+            <h2 style={{ fontSize: 24, fontWeight: 600, color: 'white', margin: '0 0 8px 0' }}>QuantumPilot AI Platform</h2>
+            <p style={{ fontSize: 13, color: '#8d8d8d', margin: 0 }}>Live IBM Quantum • 8.04M Records • NeuralUCB 8847 Contexts • Space Weather Aware • Cost Dashboard Live</p>
+          </div>
+
+          <div style={{ background: 'rgba(18, 20, 31, 0.70)', backdropFilter: 'blur(20px)', border: '1px solid #1e2235', borderRadius: 8, padding: 20, marginBottom: 24 }}>
+            <CircuitInput />
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <CopilotChat />
           </div>
 
           <div style={{
@@ -55,19 +64,7 @@ function DashboardContent() {
             padding: 20,
             marginBottom: 24
           }}>
-            <CircuitInput />
-          </div>
-
-          <div style={{ marginBottom: 24 }}>
-            <div style={{
-              background: 'rgba(18, 20, 31, 0.70)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid #1e2235',
-              borderRadius: 8,
-              padding: 20
-            }}>
-              <CopilotChat />
-            </div>
+            <CostDashboard />
           </div>
 
           <div style={{ marginBottom: 24 }}>
