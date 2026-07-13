@@ -1,0 +1,16 @@
+# Ignore large datasets for Deta - keep only essential
+datasets/calibration_drift/drift_50k.csv
+datasets/qcaleval/test-00000-of-00001.parquet
+datasets/qcaleval/fewshot-00000-of-00001.parquet
+datasets/szne/
+models/neuralucb/*.pt
+!models/neuralucb/reward_net_deep.pt
+!models/neuralucb/drift_lstm.pt
+node_modules/
+.next/
+__pycache__/
+.venv/
+logs/
+.env
+*.token
+ibm_*_properties.json
