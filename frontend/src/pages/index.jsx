@@ -9,6 +9,7 @@ const DriftChart = dynamic(() => import('../components/DriftChart'), { ssr: fals
 const T1vsKpChart = dynamic(() => import('../components/T1vsKpChart'), { ssr: false })
 const MitigationChart = dynamic(() => import('../components/MitigationChart'), { ssr: false })
 const CopilotChat = dynamic(() => import('../components/CopilotChat'), { ssr: false })
+const CircuitInput = dynamic(() => import('../components/CircuitInput'), { ssr: false })
 
 function DashboardContent() {
   return (
@@ -33,10 +34,8 @@ function DashboardContent() {
         <Header />
         
         <main style={{ padding: '24px 32px', maxWidth: 1400, margin: '0 auto' }}>
-          {/* Hero - 30% transparency as requested for each card */}
           <div style={{
-            background: 'rgba(18, 20, 31, 0.70)',
-            backdropFilter: 'blur(20px)',
+            background: '#12141f',
             border: '1px solid #1e2235',
             borderRadius: 12,
             padding: '48px 32px',
@@ -48,14 +47,24 @@ function DashboardContent() {
             <p style={{ fontSize: 14, color: '#8d8d8d', margin: 0 }}>Live IBM Quantum • 8.04M Records • NeuralUCB 8847 Contexts • Space Weather Aware • Cards 30% Transparency</p>
           </div>
 
+          <div style={{
+            background: 'rgba(18, 20, 31, 0.70)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid #1e2235',
+            borderRadius: 8,
+            padding: 20,
+            marginBottom: 24
+          }}>
+            <CircuitInput />
+          </div>
+
           <div style={{ marginBottom: 24 }}>
             <div style={{
               background: 'rgba(18, 20, 31, 0.70)',
               backdropFilter: 'blur(20px)',
               border: '1px solid #1e2235',
               borderRadius: 8,
-              padding: 0,
-              overflow: 'hidden'
+              padding: 20
             }}>
               <CopilotChat />
             </div>
@@ -74,69 +83,25 @@ function DashboardContent() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
-            <div style={{
-              background: 'rgba(18, 20, 31, 0.70)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid #1e2235',
-              borderRadius: 8,
-              padding: 20
-            }}>
+            <div style={{ background: 'rgba(18, 20, 31, 0.70)', backdropFilter: 'blur(20px)', border: '1px solid #1e2235', borderRadius: 8, padding: 20 }}>
               <BackendChart />
             </div>
-            <div style={{
-              background: 'rgba(18, 20, 31, 0.70)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid #1e2235',
-              borderRadius: 8,
-              padding: 20
-            }}>
+            <div style={{ background: 'rgba(18, 20, 31, 0.70)', backdropFilter: 'blur(20px)', border: '1px solid #1e2235', borderRadius: 8, padding: 20 }}>
               <TrainingChart />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
-            <div style={{
-              background: 'rgba(18, 20, 31, 0.70)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid #1e2235',
-              borderRadius: 8,
-              padding: 20
-            }}>
+            <div style={{ background: 'rgba(18, 20, 31, 0.70)', backdropFilter: 'blur(20px)', border: '1px solid #1e2235', borderRadius: 8, padding: 20 }}>
               <DriftChart />
             </div>
-            <div style={{
-              background: 'rgba(18, 20, 31, 0.70)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid #1e2235',
-              borderRadius: 8,
-              padding: 20
-            }}>
+            <div style={{ background: 'rgba(18, 20, 31, 0.70)', backdropFilter: 'blur(20px)', border: '1px solid #1e2235', borderRadius: 8, padding: 20 }}>
               <T1vsKpChart />
             </div>
           </div>
 
-          <div style={{
-            background: 'rgba(18, 20, 31, 0.70)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid #1e2235',
-            borderRadius: 8,
-            padding: 20,
-            marginBottom: 24
-          }}>
+          <div style={{ background: 'rgba(18, 20, 31, 0.70)', backdropFilter: 'blur(20px)', border: '1px solid #1e2235', borderRadius: 8, padding: 20, marginBottom: 24 }}>
             <MitigationChart />
-          </div>
-
-          <div style={{
-            borderTop: '1px solid #1e2235',
-            paddingTop: 16,
-            marginTop: 32,
-            display: 'flex',
-            justifyContent: 'space-between',
-            fontSize: 11,
-            color: '#8d8d8d'
-          }}>
-            <div>Cards 30% Transparency (70% Opacity) • Background 80% Opacity • Professional Enterprise</div>
-            <div>github.com/ahmedzogly/QuantumPilot-AI</div>
           </div>
         </main>
       </div>
