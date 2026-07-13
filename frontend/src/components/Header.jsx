@@ -24,6 +24,7 @@ export default function Header() {
             width: 40, 
             height: 40, 
             objectFit: 'contain',
+            borderRadius: '12px',
             filter: 'drop-shadow(0 0 8px rgba(15, 98, 254, 0.3))'
           }} 
         />
@@ -59,7 +60,7 @@ export default function Header() {
             background: '#1a1a2e',
             color: '#c6c6c6',
             border: '1px solid #2a2a40',
-            borderRadius: 6,
+            borderRadius: 20,
             fontSize: 12,
             fontWeight: 400,
             cursor: 'pointer',
