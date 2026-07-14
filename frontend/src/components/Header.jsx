@@ -1,7 +1,7 @@
 import { useLanguage } from '../context/LanguageContext'
 
 export default function Header() {
-  const { locale, toggleLocale, t } = useLanguage()
+  const { t } = useLanguage()
   
   return (
     <header style={{
@@ -24,8 +24,7 @@ export default function Header() {
             width: 40, 
             height: 40, 
             objectFit: 'contain',
-            borderRadius: '12px',
-            filter: 'drop-shadow(0 0 8px rgba(15, 98, 254, 0.3))'
+            borderRadius: '12px'
           }} 
         />
         <div>
@@ -48,30 +47,21 @@ export default function Header() {
           letterSpacing: '0.04em',
           textTransform: 'uppercase'
         }}>
-          {t('ibm_quantum')} • {t('live')}
+          {t('ibm_quantum')} - {t('live')}
         </div>
       </div>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <button
-          onClick={toggleLocale}
-          style={{
-            padding: '7px 14px',
-            background: '#1a1a2e',
-            color: '#c6c6c6',
-            border: '1px solid #2a2a40',
-            borderRadius: 20,
-            fontSize: 12,
-            fontWeight: 400,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6
-          }}
-        >
-          <span>🌐</span>
-          {t('language')}
-        </button>
+        <div style={{
+          padding: '6px 12px',
+          background: '#1a1a2e',
+          border: '1px solid #2a2a40',
+          borderRadius: 6,
+          fontSize: 11,
+          color: '#8d8d8d'
+        }}>
+          Bilingual AR/EN Supported - Academic Version
+        </div>
       </div>
     </header>
   )
