@@ -28,6 +28,7 @@ qc.measure([0,1], [0,1])`)
   const [profile, setProfile] = useState(null)
   const [executionResult, setExecutionResult] = useState(null)
   const [jobId, setJobId] = useState(null)
+  const [executionMode, setExecutionMode] = useState('real')
 
   const examples = {
     Bell_QASM: `OPENQASM 3.0;
@@ -109,9 +110,10 @@ qc.measure_all()`,
       const mockJobId = 'job-' + Date.now() + '-' + Math.random().toString(36).substring(2,8)
       setJobId(mockJobId)
       
+      const endpoint = executionMode === 'sim' ? '/api/v1/execute' : '/api/v1/execute/real'
       let response
       try {
-        response = await fetch('/api/v1/execute/real', {
+        response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -223,12 +225,20 @@ qc.measure_all()`,
               lineHeight: 1.5
             }}
           />
-          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
             <button onClick={handleAnalyze} disabled={analyzing} style={{ padding: '8px 16px', background: '#212131', color: '#c6c6c6', border: '1px solid #2a2a40', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>
               {analyzing ? '...' : (locale==='ar' ? 'تحليل' : 'Analyze')}
             </button>
-            <button onClick={handleExecute} disabled={executing} style={{ padding: '8px 16px', background: executing ? '#333' : '#24a148', color: 'white', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span>▶</span> {executing ? (locale==='ar' ? 'ينفذ...' : 'Executing...') : (locale==='ar' ? 'Execute الحقيقي على IBM Quantum' : 'Real Execute on IBM Quantum')}
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '4px', border: '1px solid #1e2235', borderRadius: 6, background: '#0f111a' }}>
+              <button onClick={() => setExecutionMode('real')} style={{ padding: '6px 10px', borderRadius: 4, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: executionMode === 'real' ? '#0f62fe' : 'transparent', color: executionMode === 'real' ? 'white' : '#8d8d8d' }}>
+                {locale==='ar' ? 'واقعى' : 'Real IBM'}
+              </button>
+              <button onClick={() => setExecutionMode('sim')} style={{ padding: '6px 10px', borderRadius: 4, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: executionMode === 'sim' ? '#24a148' : 'transparent', color: executionMode === 'sim' ? 'white' : '#8d8d8d' }}>
+                {locale==='ar' ? 'محاكاة' : 'Simulation'}
+              </button>
+            </div>
+            <button onClick={handleExecute} disabled={executing} style={{ padding: '8px 16px', background: executing ? '#333' : (executionMode === 'real' ? '#24a148' : '#8a3ffc'), color: 'white', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>▶</span> {executing ? (locale==='ar' ? 'ينفذ...' : 'Executing...') : (executionMode === 'real' ? (locale==='ar' ? 'Execute الحقيقي على IBM Quantum' : 'Real Execute on IBM Quantum') : (locale==='ar' ? 'Execute على المحاكاة' : 'Execute in Simulation'))}
             </button>
           </div>
           <div style={{ fontSize: 10, color: '#6f6f6f', marginTop: 6 }}>
@@ -244,8 +254,8 @@ qc.measure_all()`,
             {profile ? (
               <div style={{ fontSize: 12, color: '#c6c6c6', lineHeight: 1.7 }}>
                 <div>Qubits: {profile.num_qubits} • Depth: {profile.depth} • 2Q: {profile.num_2q_gates}</div>
-                <div>Fidelity Proxy: {(profile.estimated_fidelity_proxy*100).toFixed(1)}% • {profile.language}</div>
-                <div style={{ fontSize: 10, color: '#6f6f6f', marginTop: 4 }}>Q-LEAR: [{profile.Cw}, {profile.Cd}, {profile.Gc1q}, {profile.Gc2q}, {profile.Dpe.toFixed(1)}]</div>
+                <div>Fidelity Proxy: {((profile.estimated_fidelity_proxy || 0) * 100).toFixed(1)}% • {profile.language}</div>
+                <div style={{ fontSize: 10, color: '#6f6f6f', marginTop: 4 }}>Q-LEAR: [{profile.Cw ?? 'n/a'}, {profile.Cd ?? 'n/a'}, {profile.Gc1q ?? 'n/a'}, {profile.Gc2q ?? 'n/a'}, {(profile.Dpe ?? 0).toFixed(1)}]</div>
               </div>
             ) : (
               <div style={{ fontSize: 12, color: '#6f6f6f', textAlign: 'center', padding: 10 }}>Click Analyze</div>
@@ -257,9 +267,12 @@ qc.measure_all()`,
               <div style={{ fontSize: 11, color: executionResult.success ? '#24a148' : '#da1e28', fontWeight: 600, marginBottom: 6 }}>
                 {executionResult.success ? '✓ Execution Success' : '✗ Failed'} {executionResult.is_simulated ? '(Simulated)' : '(Real IBM Quantum)'}
               </div>
+              <div style={{ marginBottom: 8, padding: '6px 8px', borderRadius: 4, fontSize: 10, fontWeight: 600, background: executionResult.is_simulated ? 'rgba(241, 194, 27, 0.14)' : 'rgba(15, 98, 254, 0.14)', color: executionResult.is_simulated ? '#f1c21b' : '#0f62fe', border: `1px solid ${executionResult.is_simulated ? 'rgba(241,194,27,0.25)' : 'rgba(15,98,254,0.25)'}` }}>
+                {executionResult.is_simulated ? (locale==='ar' ? 'وضع: محاكاة محلية' : 'Mode: Local simulation') : (locale==='ar' ? 'وضع: إرسال حقيقي إلى IBM Quantum' : 'Mode: Real submission to IBM Quantum')}
+              </div>
               <div style={{ fontSize: 11, color: '#c6c6c6', lineHeight: 1.5 }}>
                 <div>Backend: {executionResult.backend_name} • Mit: {executionResult.mitigation} • Overhead: {executionResult.overhead}x</div>
-                <div>Fidelity: {(executionResult.fidelity*100).toFixed(1)}% • Queue: {(executionResult.queue_time_ms/1000).toFixed(1)}s • Cost: {executionResult.cost_seconds.toFixed(1)}s</div>
+                <div>Fidelity: {(((executionResult.fidelity ?? 0) * 100)).toFixed(1)}% • Queue: {(((executionResult.queue_time_ms ?? 0) / 1000)).toFixed(1)}s • Cost: {(executionResult.cost_seconds ?? 0).toFixed(1)}s</div>
                 <div style={{ marginTop: 4, fontFamily: 'monospace', fontSize: 10, background: '#070a14', padding: 6, borderRadius: 4 }}>Counts: {JSON.stringify(executionResult.counts)}</div>
               </div>
             </div>

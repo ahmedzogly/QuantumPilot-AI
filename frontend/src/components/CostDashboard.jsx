@@ -74,17 +74,17 @@ export default function CostDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
         <div style={{ background: '#0f111a', border: '1px solid #1e2235', borderRadius: 8, padding: 12 }}>
           <div style={{ fontSize: 11, color: '#8d8d8d', textTransform: 'uppercase' }}>{locale==='ar' ? 'إجمالي التكلفة' : 'Total Cost'}</div>
-          <div style={{ fontSize: 20, fontWeight: 300, color: '#f4f4f4', marginTop: 4 }}>{costData.total_cost_seconds.toFixed(1)}s</div>
+          <div style={{ fontSize: 20, fontWeight: 300, color: '#f4f4f4', marginTop: 4 }}>{(costData.total_cost_seconds ?? 0).toFixed(1)}s</div>
           <div style={{ fontSize: 11, color: '#8d8d8d', marginTop: 4 }}>{costData.total_executions} executions</div>
         </div>
         <div style={{ background: 'rgba(36,161,72,0.08)', border: '1px solid rgba(36,161,72,0.2)', borderRadius: 8, padding: 12 }}>
           <div style={{ fontSize: 11, color: '#24a148', textTransform: 'uppercase' }}>{locale==='ar' ? 'إجمالي التوفير' : 'Total Saved'}</div>
-          <div style={{ fontSize: 20, fontWeight: 300, color: '#24a148', marginTop: 4 }}>{costData.total_saving_seconds.toFixed(1)}s</div>
+          <div style={{ fontSize: 20, fontWeight: 300, color: '#24a148', marginTop: 4 }}>{(costData.total_saving_seconds ?? 0).toFixed(1)}s</div>
           <div style={{ fontSize: 11, color: '#24a148', marginTop: 4 }}>{costData.saving_percent}% saving from S-ZNE</div>
         </div>
         <div style={{ background: '#0f111a', border: '1px solid #1e2235', borderRadius: 8, padding: 12 }}>
           <div style={{ fontSize: 11, color: '#8d8d8d', textTransform: 'uppercase' }}>{locale==='ar' ? 'التكلفة بدون تخفيف' : 'Cost without Mitigation'}</div>
-          <div style={{ fontSize: 20, fontWeight: 300, color: '#da1e28', marginTop: 4 }}>{costData.total_cost_without_mitigation.toFixed(1)}s</div>
+          <div style={{ fontSize: 20, fontWeight: 300, color: '#da1e28', marginTop: 4 }}>{(costData.total_cost_without_mitigation ?? 0).toFixed(1)}s</div>
           <div style={{ fontSize: 11, color: '#8d8d8d', marginTop: 4 }}>ZNE 5x baseline</div>
         </div>
         <div style={{ background: '#0f111a', border: '1px solid #1e2235', borderRadius: 8, padding: 12 }}>
@@ -170,8 +170,8 @@ export default function CostDashboard() {
         </div>
         <div style={{ fontSize: 11, color: '#8d8d8d', lineHeight: 1.6 }}>
           {locale==='ar' ?
-          `بدون المنصة: كل تنفيذ ZNE 5x يكلف 5*10s=50s. مع 127 تنفيذ = 1423.8s. مع المنصة: S-ZNE 1.2x + اختيار kingston الأفضل T1 231us + تجنب kp العالي = 342.5s فقط. توفير ${costData.total_saving_seconds.toFixed(1)}s = ${costData.saving_percent}% من وقت الكوانتم = توفير فلوس حقيقي. Job حقيقي ${costData.real_job.job_id} على kingston 156q يوفر ${costData.real_job.saving}s مقارنة بـ ZNE.` :
-          `Without platform: Each ZNE 5x costs 5*10s=50s. 127 exec = 1423.8s. With platform: S-ZNE 1.2x + best backend kingston T1 231us + avoid high kp = 342.5s only. Saving ${costData.total_saving_seconds.toFixed(1)}s = ${costData.saving_percent}% quantum time = real money saving. Real job ${costData.real_job.job_id} on kingston 156q saves ${costData.real_job.saving}s vs ZNE.`
+          `بدون المنصة: كل تنفيذ ZNE 5x يكلف 5*10s=50s. مع 127 تنفيذ = 1423.8s. مع المنصة: S-ZNE 1.2x + اختيار kingston الأفضل T1 231us + تجنب kp العالي = 342.5s فقط. توفير ${(costData.total_saving_seconds ?? 0).toFixed(1)}s = ${costData.saving_percent ?? 0}% من وقت الكوانتم = توفير فلوس حقيقي. Job حقيقي ${costData.real_job?.job_id || 'n/a'} على kingston 156q يوفر ${(costData.real_job?.saving ?? 0)}s مقارنة بـ ZNE.` :
+          `Without platform: Each ZNE 5x costs 5*10s=50s. 127 exec = 1423.8s. With platform: S-ZNE 1.2x + best backend kingston T1 231us + avoid high kp = 342.5s only. Saving ${(costData.total_saving_seconds ?? 0).toFixed(1)}s = ${costData.saving_percent ?? 0}% quantum time = real money saving. Real job ${costData.real_job?.job_id || 'n/a'} on kingston 156q saves ${(costData.real_job?.saving ?? 0)}s vs ZNE.`
           }
         </div>
       </div>

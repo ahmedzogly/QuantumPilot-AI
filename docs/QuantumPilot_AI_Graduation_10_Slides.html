@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuantumPilot AI - Graduation Project Progress - 10 Slides Professional</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #12141f;
+  --bg-card-hover: #1a1a2e;
+  --foreground: #f4f4f4;
+  --muted: #8d8d8d;
+  --muted-2: #6f6f6f;
+  --accent: #0f62fe;
+  --accent2: #8a3ffc;
+  --accent3: #08bdba;
+  --border: #1e2235;
+  --border-light: #2a2a40;
+  --font-display: 'Manrope', sans-serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --reveal-duration: 0.6s;
+  --reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --reveal-distance: 24px;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow-x: hidden; background: var(--bg); }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+h1 { font-size: 56px; line-height: 1.05; letter-spacing: -0.02em; font-weight: 800; }
+h2 { font-size: 40px; line-height: 1.1; letter-spacing: -0.01em; font-weight: 700; }
+h3 { font-size: 24px; line-height: 1.2; font-weight: 600; }
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.slide-viewport {
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: block;
+  position: relative;
+  background: var(--bg);
+}
+.slide-scale {
+  width: 1920px; height: 1080px;
+  transform: translate(-50%, -50%) scale(var(--slide-scale, 1));
+  transform-origin: center center;
+  position: absolute;
+  top: 50%; left: 50%;
+}
+.slide {
+  width: 1920px; height: 1080px;
+  padding: 80px 100px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 32px;
+  position: relative;
+  background: transparent;
+}
+.title-slide {
+  background: radial-gradient(ellipse at top, rgba(15,98,254,0.15) 0%, transparent 60%), radial-gradient(ellipse at bottom right, rgba(138,63,255,0.1) 0%, transparent 60%), var(--bg);
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+.title-slide h1 {
+  font-size: 72px;
+  background: linear-gradient(135deg, #ffffff 0%, #8d8d8d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.dark-slide { background: var(--bg); color: var(--foreground); }
+.light-slide { background: #fafafa; color: #111; --border: #e5e5e5; --muted: #6f6f6f; }
+.light-slide h2 { color: #0a0a0a; }
+.light-slide .card { background: white; border: 1px solid #e5e5e5; }
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+}
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; }
+.stat-card {
+  background: rgba(18, 20, 31, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+.stat-card .number { font-size: 40px; font-weight: 700; color: var(--accent); line-height: 1; }
+.stat-card .label { font-size: 13px; color: var(--muted); margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 16px; }
+th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+th { font-weight: 600; color: var(--accent); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.arch-flow { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 24px; }
+.arch-row { display: flex; gap: 12px; align-items: center; }
+.arch-box {
+  background: linear-gradient(135deg, rgba(15,98,254,0.12), rgba(138,63,255,0.08));
+  border: 1px solid rgba(15,98,254,0.2);
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 160px;
+  color: #c6c6c6;
+}
+.arch-arrow { font-size: 18px; color: var(--accent); }
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+.badge-blue { background: rgba(15,98,254,0.12); color: #0f62fe; border: 1px solid rgba(15,98,254,0.2); }
+.badge-green { background: rgba(36,161,72,0.1); color: #24a148; border: 1px solid rgba(36,161,72,0.2); }
+ul { list-style: none; padding: 0; margin-top: 12px; }
+li { font-size: 18px; line-height: 1.6; padding-left: 24px; position: relative; margin-bottom: 12px; color: #c6c6c6; }
+li::before { content: '•'; position: absolute; left: 0; color: var(--accent); font-weight: bold; }
+.slide-num { position: absolute; bottom: 20px; left: 32px; font-family: monospace; font-size: 12px; color: #3a3a4a; }
+:root:not(.reveals-ready) .reveal { opacity: 0; }
+.reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.d1 { transition-delay: 0.1s; }
+.d2 { transition-delay: 0.2s; }
+.d3 { transition-delay: 0.3s; }
+.d4 { transition-delay: 0.4s; }
+.nav-dots { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 50; }
+.nav-dots button { width: 8px; height: 8px; border-radius: 50%; border: 1px solid #8d8d8d; background: transparent; cursor: pointer; opacity: 0.4; }
+.nav-dots button.active { background: #0f62fe; border-color: #0f62fe; opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- Slide 1: Title - 1/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide title-slide">
+  <div style="width: 80px; height: 80px; background: #0f62fe; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto; font-weight: 700; font-size: 32px; color: white;">Q</div>
+  <h1 class="reveal d1">QuantumPilot AI</h1>
+  <p class="reveal d2" style="font-size: 24px; color: #c6c6c6; margin-top: 12px; font-weight: 400;">AI-Powered Operating Intelligence Platform for Quantum Computing</p>
+  <div class="reveal d3" style="margin-top: 24px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+    <span class="badge badge-blue">Live IBM Quantum</span>
+    <span class="badge badge-blue">8.04M Records</span>
+    <span class="badge badge-blue">NeuralUCB</span>
+    <span class="badge badge-blue">Space Weather Aware</span>
+    <span class="badge badge-green">Production Ready</span>
+  </div>
+  <div class="reveal d4" style="margin-top: 60px; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto; background: rgba(18,20,31,0.6); border: 1px solid #1e2235; border-radius: 12px; padding: 24px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 16px;">
+      <div>
+        <div style="font-size: 11px; color: #6f6f6f; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Graduation Project Progress Presentation</div>
+        <div style="color: #8d8d8d; font-size: 14px;">Team Members</div>
+        <div style="color: #f4f4f4; font-size: 14px; margin-top: 4px;">[Your Names]</div>
+      </div>
+      <div>
+        <div style="color: #8d8d8d; font-size: 14px;">Supervisor</div>
+        <div style="color: #f4f4f4; font-size: 14px; margin-top: 4px;">[Supervisor Name]</div>
+        <div style="color: #8d8d8d; font-size: 14px; margin-top: 12px;">Date</div>
+        <div style="color: #f4f4f4; font-size: 14px; margin-top: 4px;">July 2026</div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num">01 / 10</span>
+</section>
+</div>
+</div>
+
+<!-- Slide 2: Introduction - 2/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide">
+  <div class="eyebrow reveal d1" style="color: #0f62fe;">02 • Introduction</div>
+  <h2 class="reveal d2" style="font-size: 42px;">Why QuantumPilot AI?</h2>
+  <p class="reveal d3" style="font-size: 20px; color: #c6c6c6; max-width: 900px; margin-top: 16px;">Quantum computing is entering the <strong style="color: #f4f4f4;">NISQ era</strong>, but executing quantum circuits remains difficult because researchers must manually choose:</p>
+  <div class="reveal d4" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px;">
+    <div class="card">
+      <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Quantum Backend</div>
+      <div style="font-size: 13px; color: #8d8d8d;">156 qubits, varying T1/T2, gate errors, queue times, calibration drift</div>
+    </div>
+    <div class="card">
+      <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Optimization Level</div>
+      <div style="font-size: 13px; color: #8d8d8d;">Transpiler levels 0-3 affect depth, gate count, fidelity</div>
+    </div>
+    <div class="card">
+      <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Error Mitigation</div>
+      <div style="font-size: 13px; color: #8d8d8d;">ZNE 5× cost, PEC, CDR, TREX - trade-off cost vs accuracy</div>
+    </div>
+  </div>
+  <div class="reveal d4" style="margin-top: 32px; background: rgba(15,98,254,0.08); border: 1px solid rgba(15,98,254,0.15); border-radius: 12px; padding: 20px;">
+    <p style="font-size: 18px; color: #c6c6c6;"><strong style="color: #f4f4f4;">Our Goal:</strong> Build an <strong style="color: #0f62fe;">AI-powered Autopilot</strong> that automatically plans and manages quantum execution.</p>
+  </div>
+  <span class="slide-num">02 / 10</span>
+</section>
+</div>
+</div>
+
+<!-- Slide 3: Literature Review - 3/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide">
+  <div class="eyebrow reveal d1">03 • Literature Review</div>
+  <h2 class="reveal d2">Current Tools Are Fragmented</h2>
+  <table class="reveal d3" style="margin-top: 24px;">
+    <tr><th>Existing Solution</th><th>Limitation</th></tr>
+    <tr><td>IBM Quantum Runtime</td><td>Backend selection only (least_busy) - ignores health metrics like T1, T2</td></tr>
+    <tr><td>Mitiq</td><td>Error mitigation library only - no AI decision, no monitoring</td></tr>
+    <tr><td>Q-LEAR</td><td>Circuit analysis only - features without decision engine</td></tr>
+    <tr><td>Qedma</td><td>Noise suppression only - not full lifecycle</td></tr>
+    <tr><td>QDevOps</td><td>Monitoring only - no adaptive decision or cost optimization</td></tr>
+  </table>
+  <div class="reveal d4" style="margin-top: 32px; background: #12141f; border: 1px solid #1e2235; border-radius: 12px; padding: 20px;">
+    <div style="font-size: 14px; color: #0f62fe; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Research Gap</div>
+    <p style="font-size: 18px; color: #c6c6c6;">No integrated platform combines <strong style="color: white;">Decision Making, Backend Selection, Error Mitigation, Monitoring, Continuous Learning</strong> into one unified system with explainability and cost awareness.</p>
+  </div>
+  <span class="slide-num">03 / 10</span>
+</section>
+</div>
+</div>
+
+<!-- Slide 4: Problem Statement - 4/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide">
+  <div class="eyebrow reveal d1">04 • Problem Statement</div>
+  <h2 class="reveal d2">The Core Challenge</h2>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 24px;">
+    <div>
+      <h3 style="font-size: 16px; color: #f4f4f4; margin-bottom: 16px;">Current execution requires manually selecting:</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li style="display: flex; gap: 12px; margin-bottom: 12px;"><span style="color: #0f62fe;">•</span><span style="color: #c6c6c6; font-size: 18px;">Backend</span></li>
+        <li style="display: flex; gap: 12px; margin-bottom: 12px;"><span style="color: #0f62fe;">•</span><span style="color: #c6c6c6; font-size: 18px;">Optimization Level</span></li>
+        <li style="display: flex; gap: 12px; margin-bottom: 12px;"><span style="color: #0f62fe;">•</span><span style="color: #c6c6c6; font-size: 18px;">Error Mitigation Strategy</span></li>
+      </ul>
+      <div style="margin-top: 24px; padding: 16px; background: rgba(218,30,40,0.08); border: 1px solid rgba(218,30,40,0.15); border-radius: 8px;">
+        <div style="font-size: 13px; color: #da1e28; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Poor decisions lead to:</div>
+        <div style="font-size: 14px; color: #c6c6c6; line-height: 1.8;">Low Fidelity • Long Queue • Higher Cost • Failed Executions</div>
+      </div>
+    </div>
+    <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; justify-content: center;">
+      <div style="font-size: 12px; color: #0f62fe; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;">Objective</div>
+      <p style="font-size: 24px; color: #f4f4f4; font-weight: 600; line-height: 1.3;">Automatically select the best execution strategy using AI.</p>
+      <p style="font-size: 14px; color: #8d8d8d; margin-top: 12px;">Multi-objective: Fidelity, Time, Queue, Cost, Environmental awareness</p>
+    </div>
+  </div>
+  <span class="slide-num">04 / 10</span>
+</section>
+</div>
+</div>
+
+<!-- Slide 5: Proposed Method - 5/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide">
+  <div class="eyebrow reveal d1">05 • Proposed Method</div>
+  <h2 class="reveal d2">AI Orchestration - Full Lifecycle in 8 Steps</h2>
+  <div style="display: flex; gap: 16px; margin-top: 24px; align-items: flex-start;">
+    <div style="flex: 1;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <div style="background: #12141f; border: 1px solid #2a2a40; border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #c6c6c6; min-width: 200px; text-align: center;">User Intent</div>
+        <div style="color: #0f62fe;">↓</div>
+        <div style="background: rgba(15,98,254,0.12); border: 1px solid rgba(15,98,254,0.25); border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #0f62fe; min-width: 200px; text-align: center; font-weight: 600;">Copilot (Natural Language)</div>
+        <div style="color: #0f62fe;">↓</div>
+        <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #c6c6c6; min-width: 200px; text-align: center;">Circuit Analysis<br><span style="font-size: 11px; color: #8d8d8d;">Q-LEAR Features</span></div>
+        <div style="color: #0f62fe;">↓</div>
+        <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #c6c6c6; min-width: 200px; text-align: center;">Decision Engine<br><span style="font-size: 11px; color: #8d8d8d;">NeuralUCB 22-D</span></div>
+        <div style="color: #0f62fe;">↓</div>
+        <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #c6c6c6; min-width: 200px; text-align: center;">Backend Selection</div>
+      </div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #c6c6c6; min-width: 200px; text-align: center;">Error Mitigation<br><span style="font-size: 11px; color: #8d8d8d;">S-ZNE 1.2x</span></div>
+      <div style="color: #0f62fe;">↓</div>
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #c6c6c6; min-width: 200px; text-align: center;">IBM Quantum Runtime</div>
+      <div style="color: #0f62fe;">↓</div>
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #c6c6c6; min-width: 200px; text-align: center;">Execution Monitor<br><span style="font-size: 11px; color: #8d8d8d;">Progress Bars</span></div>
+      <div style="color: #0f62fe;">↓</div>
+      <div style="background: rgba(36,161,72,0.1); border: 1px solid rgba(36,161,72,0.2); border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #24a148; min-width: 200px; text-align: center; font-weight: 600;">Learning Engine<br><span style="font-size: 11px; color: #8d8d8d;">Reward → Knowledge Graph</span></div>
+    </div>
+  </div>
+  <div style="margin-top: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+    <div style="background: rgba(15,98,254,0.08); border: 1px solid rgba(15,98,254,0.15); border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 12px; font-weight: 600; color: #0f62fe;">AI Decision Engine</div>
+      <div style="font-size: 11px; color: #8d8d8d; margin-top: 4px;">22-D Context, 72 Arms</div>
+    </div>
+    <div style="background: rgba(15,98,254,0.08); border: 1px solid rgba(15,98,254,0.15); border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 12px; font-weight: 600; color: #0f62fe;">Live IBM Calibration</div>
+      <div style="font-size: 11px; color: #8d8d8d; margin-top: 4px;">3×156q Heron R2</div>
+    </div>
+    <div style="background: rgba(15,98,254,0.08); border: 1px solid rgba(15,98,254,0.15); border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 12px; font-weight: 600; color: #0f62fe;">Error Mitigation</div>
+      <div style="font-size: 11px; color: #8d8d8d; margin-top: 4px;">7 Methods, 76% Saving</div>
+    </div>
+    <div style="background: rgba(36,161,72,0.08); border: 1px solid rgba(36,161,72,0.15); border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 12px; font-weight: 600; color: #24a148;">Continuous Learning</div>
+      <div style="font-size: 11px; color: #8d8d8d; margin-top: 4px;">Knowledge Graph</div>
+    </div>
+  </div>
+  <span class="slide-num">05 / 10</span>
+</section>
+</div>
+</div>
+
+<!-- Slide 6: Data Set Description - 6/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide">
+  <div class="eyebrow">06 • Data Set Description</div>
+  <h2>Real Data - Live + Historical + Synthetic</h2>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px;">
+    <div>
+      <h3 style="font-size: 14px; color: #0f62fe; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Live Data</h3>
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px;">
+        <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">IBM Quantum Backends</div>
+        <div style="font-size: 12px; color: #8d8d8d; line-height: 1.6;">3×156q Heron R2: fez, marrakesh, kingston<br>T1 135.6μs, 170.9μs, 231μs BEST<br>352 CZ gates, mean 3.33% error<br>1.1MB JSON + 17MB NoiseModel</div>
+      </div>
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px; margin-top: 12px;">
+        <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Backend Calibration</div>
+        <div style="font-size: 12px; color: #8d8d8d; line-height: 1.6;">T1, T2, readout error, gate error, queue length, calibration age, anharmonicity</div>
+      </div>
+    </div>
+    <div>
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px;">
+        <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Historical Data</div>
+        <div style="font-size: 12px; color: #8d8d8d; line-height: 1.6;"><strong style="color: #c6c6c6;">8M Calibration Records</strong><br>8,042,108 rows → 50K sample → 8847 aggregated contexts<br>T1 min 7.2 max 406.6 mean 70.9μs<br>Training NeuralUCB + Drift Prediction</div>
+      </div>
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px; margin-top: 12px;">
+        <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Environmental Data</div>
+        <div style="font-size: 12px; color: #8d8d8d; line-height: 1.6;"><strong style="color: #c6c6c6;">NOAA Space Weather</strong><br>Kp-index, neutron flux, solar zenith, temperature, pressure, bz - Live 1-min API<br>For drift prediction & context</div>
+      </div>
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px; margin-top: 12px;">
+        <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Additional Data</div>
+        <div style="font-size: 12px; color: #8d8d8d; line-height: 1.6;">QCalEval (243 images), S-ZNE (100q predictions), Clifford Training (100 ideal/noisy pairs, 94.3% fidelity)</div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-num">06 / 10</span>
+</section>
+</div>
+</div>
+
+<!-- Slide 7: Results - 7/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide">
+  <div class="eyebrow">07 • Results & Analysis - Current Progress</div>
+  <h2>Production Ready - 95% - Live Results</h2>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px;">
+    <div class="card" style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px; text-align: center;">
+      <div style="font-size: 12px; color: #8d8d8d; text-transform: uppercase;">Completed</div>
+      <div style="margin-top: 12px; font-size: 13px; color: #c6c6c6; line-height: 1.8; text-align: left;">
+        ✓ AI Decision Engine<br>✓ Backend Selection<br>✓ Live IBM Integration<br>✓ Copilot (Bilingual)<br>✓ Space Weather Service<br>✓ Dashboard (6 Charts)<br>✓ Docker Deployment (6 Services)
+      </div>
+    </div>
+    <div class="card" style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px; text-align: center;">
+      <div style="font-size: 12px; color: #8d8d8d; text-transform: uppercase;">Current Results</div>
+      <div style="margin-top: 12px; font-size: 13px; color: #c6c6c6; line-height: 1.8; text-align: left;">
+        • NeuralUCB trained successfully<br>• Validation loss decreasing<br>• S-ZNE integrated 1.2x vs 5x<br>• Live Backend Monitoring<br>• Space Weather correlation found<br>• 8,847 contexts • 76% saving
+      </div>
+    </div>
+    <div class="card" style="background: rgba(15,98,254,0.08); border: 1px solid rgba(15,98,254,0.15); border-radius: 8px; padding: 16px; text-align: center;">
+      <div style="font-size: 12px; color: #0f62fe; text-transform: uppercase;">Live Demo</div>
+      <div style="margin-top: 12px; font-size: 11px; color: #8d8d8d; line-height: 1.6; text-align: left; font-family: monospace;">
+        quantumpilot-ai.vercel.app<br>github.com/ahmedzogly/QuantumPilot-AI<br>132 files • 20 docs • CI/CD<br>Docker Prod • Vercel 100%
+      </div>
+    </div>
+  </div>
+  <span class="slide-num">07 / 10</span>
+</section>
+</div>
+</div>
+
+<!-- Slide 8: Evaluation Metrics - 8/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide">
+  <div class="eyebrow">08 • Evaluation Metrics</div>
+  <h2>We Evaluate Multi-Dimensional Success</h2>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px;">
+    <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px;">
+      <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Backend Selection</div>
+      <div style="font-size: 12px; color: #8d8d8d; line-height: 1.6;">Accuracy • Fidelity<br>T1/T2 • Readout • Gate Error<br>Queue Time • Calibration Age</div>
+    </div>
+    <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px;">
+      <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Execution Quality</div>
+      <div style="font-size: 12px; color: #8d8d8d; line-height: 1.6;">Fidelity • Success Rate<br>Execution Time • Queue Time<br>Cost Saving • UCB Confidence</div>
+    </div>
+    <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 16px;">
+      <div style="font-size: 13px; font-weight: 600; color: #f4f4f4; margin-bottom: 8px;">Efficiency & Explainability</div>
+      <div style="font-size: 12px; color: #8d8d8d; line-height: 1.6;">Error Mitigation Overhead<br>Quantum Time Saved<br>Explainability: Why chosen?</div>
+    </div>
+  </div>
+  <div style="margin-top: 24px; background: rgba(15,98,254,0.06); border: 1px solid rgba(15,98,254,0.12); border-radius: 8px; padding: 16px;">
+    <div style="font-size: 12px; color: #0f62fe; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Reward Function (Multi-Objective)</div>
+    <div style="font-size: 16px; color: #c6c6c6; font-family: monospace;">Reward = 0.5×Fidelity −0.2×Time −0.2×Queue −0.1×Cost −0.01×Kp</div>
+    <div style="font-size: 12px; color: #8d8d8d; margin-top: 8px;">Balances quality, speed, cost, and environmental risk - Evaluated via cumulative regret vs Oracle</div>
+  </div>
+  <span class="slide-num">08 / 10</span>
+</section>
+</div>
+</div>
+
+<!-- Slide 9: Future Work - 9/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide">
+  <div class="eyebrow">09 • Future Work</div>
+  <h2>From 9.5/10 to 10/10 - Next Steps</h2>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px;">
+    <div>
+      <h3 style="font-size: 14px; color: #0f62fe; margin-bottom: 12px;">Short-term (Week 2-3)</h3>
+      <ul style="font-size: 14px;">
+        <li>More Real IBM Experiments (100+ executions)</li>
+        <li>Compare random, least-busy, Q-LEAR baselines</li>
+        <li>Complete sensitivity & ablation studies</li>
+        <li>Result export & Dashboard PDF</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size: 14px; color: #0f62fe; margin-bottom: 12px;">Mid-term (Month 2)</h3>
+      <ul style="font-size: 14px;">
+        <li>Improve NeuralUCB (QNTK-UCB quantum advantage)</li>
+        <li>Publish Research Paper (Space Weather correlation)</li>
+        <li>Multi-cloud: AWS Braket, Azure Quantum</li>
+        <li>Knowledge Graph for cross-session learning</li>
+      </ul>
+    </div>
+  </div>
+  <div style="margin-top: 24px;">
+    <h3 style="font-size: 14px; color: #0f62fe; margin-bottom: 12px;">Long-term (Month 3-6)</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 12px; font-size: 13px; color: #c6c6c6;">Large-scale Validation (1000+ qubits)</div>
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 12px; font-size: 13px; color: #c6c6c6;">Federated Learning across institutions</div>
+      <div style="background: #12141f; border: 1px solid #1e2235; border-radius: 8px; padding: 12px; font-size: 13px; color: #c6c6c6;">Enterprise SSO & Billing</div>
+    </div>
+  </div>
+  <span class="slide-num">09 / 10</span>
+</section>
+</div>
+</div>
+
+<!-- Slide 10: Conclusion - 10/10 -->
+<div class="slide-viewport">
+<div class="slide-scale">
+<section class="slide" style="align-items: center; text-align: center;">
+  <div style="width: 80px; height: 80px; background: #0f62fe; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto; font-weight: 700; font-size: 32px; color: white;">Q</div>
+  <h2 style="font-size: 40px; text-align: center;">QuantumPilot AI</h2>
+  <p style="font-size: 20px; color: #c6c6c6; max-width: 800px; text-align: center; margin: 16px auto 0 auto;">Provides an intelligent layer over existing quantum platforms by integrating <strong style="color: white;">AI Decision Making, Backend Selection, Error Mitigation, Live Monitoring, Continuous Learning</strong> into one unified platform.</p>
+  <div style="margin-top: 32px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <span style="padding: 8px 16px; background: #12141f; border: 1px solid #1e2235; border-radius: 20px; font-size: 13px; color: #8d8d8d;">Live IBM Quantum • 156q Heron R2</span>
+    <span style="padding: 8px 16px; background: #12141f; border: 1px solid #1e2235; border-radius: 20px; font-size: 13px; color: #8d8d8d;">8.04M Records • 8847 Contexts</span>
+    <span style="padding: 8px 16px; background: rgba(36,161,72,0.1); border: 1px solid rgba(36,161,72,0.2); border-radius: 20px; font-size: 13px; color: #24a148;">76% Cost Saving • S-ZNE 1.2x</span>
+    <span style="padding: 8px 16px; background: rgba(15,98,254,0.1); border: 1px solid rgba(15,98,254,0.2); border-radius: 20px; font-size: 13px; color: #0f62fe;">Production Ready • Vercel • Docker • CI/CD</span>
+  </div>
+  <div style="margin-top: 48px;">
+    <p style="font-size: 32px; font-weight: 700; color: white;">Thank You</p>
+    <p style="font-size: 18px; color: #8d8d8d; margin-top: 12px;">Questions?</p>
+    <p style="font-size: 13px; color: #6f6f6f; margin-top: 24px;">github.com/ahmedzogly/QuantumPilot-AI • quantumpilot-ai.vercel.app • Apache 2.0 • ahmedzogly26@gmail.com</p>
+  </div>
+  <span class="slide-num">10 / 10</span>
+</section>
+</div>
+</div>
+
+</body>
+</html>

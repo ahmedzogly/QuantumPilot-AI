@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     
     # Model paths
     GRANITE_MODEL_PATH: str = "Qiskit/granite-8b-qiskit"
+    DATASET_ROOT: str = os.getenv("DATASET_ROOT", "datasets")
     
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://frontend:3000"]

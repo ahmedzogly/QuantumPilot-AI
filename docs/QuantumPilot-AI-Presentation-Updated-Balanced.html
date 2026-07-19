@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<!-- skill:chassis -->
+<style>
+/* =====================================================
+   PRESENTATION CHASSIS — style-invariant base styles
+   Fixed 1920×1080 canvas scaled to fit any viewport.
+   Customize colors, fonts, and chrome via :root tokens.
+   ===================================================== */
+
+/* ---------- Universal reset ---------- */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ---------- Theme tokens (override in your deck's CSS) ---------- */
+:root {
+    color-scheme: light;
+
+    --background:      #ffffff;
+    --foreground:      #111111;
+    --card:            #f5f5f5;
+    --card-foreground: var(--foreground);
+    --accent:          #c94a3d;
+    --accent-foreground: #ffffff;
+
+    --muted-foreground: color-mix(in srgb, var(--foreground) 55%, transparent);
+    --border:           color-mix(in srgb, var(--foreground) 12%, transparent);
+
+    --font-display: Georgia, serif;
+    --font-body: -apple-system, system-ui, sans-serif;
+    --font-mono: ui-monospace, monospace;
+
+    /* Reveal animation */
+    --reveal-duration: 0.8s;
+    --reveal-ease:     cubic-bezier(0.16, 1, 0.3, 1);
+    --reveal-distance: 28px;
+
+    /* Chrome (nav dots, keyboard hint) */
+    --nav-dot-size: 9px;
+    --nav-dot-radius: 50%;
+    --nav-dot-color: var(--foreground);
+    --nav-dot-active-color: var(--accent);
+    --nav-dot-opacity: 0.4;
+}
+
+/* ---------- Viewport lock + scroll snap ---------- */
+html, body { height: 100%; overflow-x: hidden; }
+html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+
+html, body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+/* ---------- Type scale ----------
+   Fixed px sizes on a 1920×1080 canvas. The canvas is scaled to fit
+   any viewport via transform, so these sizes are absolute within the
+   design surface — no responsive units needed. */
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    font-size: 36px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1 { font-size: 120px; line-height: 1.05; letter-spacing: -0.02em; }
+h2 { font-size: 64px; line-height: 1.1; letter-spacing: -0.01em; }
+h3 { font-size: 44px; line-height: 1.2; }
+.eyebrow {
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.3;
+}
+
+ul, ol { padding-left: 48px; display: flex; flex-direction: column; gap: 24px; }
+li::marker { color: var(--accent); }
+
+/* ---------- Slide structure ----------
+   .slide is the authored 1920×1080 artboard.
+   The chassis wraps it in viewport + scale layers at runtime. */
+.slide-viewport {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: block;
+    position: relative;
+    background: var(--background);
+    isolation: isolate;
+    z-index: 1;
+}
+
+.slide-scale {
+    width: 1920px;
+    height: 1080px;
+    transform: translate(-50%, -50%) scale(var(--slide-scale, 1));
+    transform-origin: center center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+}
+
+.slide {
+    width: 1920px;
+    height: 1080px;
+    padding: 80px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 60px;
+    position: relative;
+    background: transparent;
+}
+
+
+/* ---------- Image defaults ---------- */
+img, .image-container {
+    max-width: 100%;
+    max-height: 540px;
+    object-fit: contain;
+}
+
+/* ---------- Reveal primitives ----------
+   Driven by chassis.js via the Web Animations API, not CSS transitions.
+   Put .reveal* or .step on ANY element — author CSS on the same element
+   (opacity, transform, transition, filter) never conflicts, because
+   WAAPI animations live in the animation cascade origin and win over
+   normal author declarations. The .dN stagger classes below still apply
+   to theme-authored CSS animations via animation-delay.
+
+   Variants: .reveal (fade + up), .reveal-left, .reveal-right,
+   .reveal-scale, .reveal-blur. .step stays hidden until the user
+   advances forward. Don't combine .step with .reveal* on the same
+   element. */
+
+/* FOUC guard: hide reveals until chassis.js marks the document ready. */
+:root:not(.reveals-ready) .reveal,
+:root:not(.reveals-ready) .reveal-left,
+:root:not(.reveals-ready) .reveal-right,
+:root:not(.reveals-ready) .reveal-scale,
+:root:not(.reveals-ready) .reveal-blur,
+:root:not(.reveals-ready) .step {
+    opacity: 0;
+}
+:root:not(.reveals-ready) .reveal-blur { filter: blur(10px); }
+
+/* ---------- Stagger delays (.d1 … .d8) ---------- */
+.slide.visible .d1 { transition-delay: 0.10s; animation-delay: 0.10s; }
+.slide.visible .d2 { transition-delay: 0.25s; animation-delay: 0.25s; }
+.slide.visible .d3 { transition-delay: 0.40s; animation-delay: 0.40s; }
+.slide.visible .d4 { transition-delay: 0.55s; animation-delay: 0.55s; }
+.slide.visible .d5 { transition-delay: 0.70s; animation-delay: 0.70s; }
+.slide.visible .d6 { transition-delay: 0.85s; animation-delay: 0.85s; }
+.slide.visible .d7 { transition-delay: 1.00s; animation-delay: 1.00s; }
+.slide.visible .d8 { transition-delay: 1.15s; animation-delay: 1.15s; }
+
+/* ---------- Nav dots ----------
+   Default: right-center (vertical stack on right edge).
+   Override with <body data-nav="bottom | top-right | hidden">. */
+.nav-dots {
+    position: fixed;
+    right: clamp(0.6rem, 1.5vw, 1.4rem);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, 1vh, 0.8rem);
+    z-index: 50;
+}
+
+body[data-nav="bottom"] .nav-dots {
+    right: auto;
+    top: auto;
+    bottom: clamp(1rem, 2.5vh, 2rem);
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+}
+
+body[data-nav="top-right"] .nav-dots {
+    right: clamp(1rem, 2.5vw, 2rem);
+    top: clamp(1rem, 2.5vh, 2rem);
+    transform: none;
+    flex-direction: row;
+}
+
+body[data-nav="hidden"] .nav-dots { display: none; }
+
+body[data-nav="bottom"] .keyboard-hint {
+    left: clamp(1rem, 2vw, 1.5rem);
+    transform: none;
+}
+
+.nav-dots button {
+    width: var(--nav-dot-size);
+    height: var(--nav-dot-size);
+    border-radius: var(--nav-dot-radius);
+    border: 1.5px solid var(--nav-dot-color);
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+    opacity: var(--nav-dot-opacity);
+}
+.nav-dots button:hover { opacity: 0.85; transform: scale(1.15); }
+.nav-dots button:focus-visible {
+    outline: 2px solid var(--nav-dot-active-color);
+    outline-offset: 3px;
+    opacity: 1;
+}
+.nav-dots button.active {
+    background: var(--nav-dot-active-color);
+    border-color: var(--nav-dot-active-color);
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* ---------- Keyboard hint ---------- */
+.keyboard-hint {
+    position: fixed;
+    bottom: clamp(0.6rem, 1.2vh, 1rem);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--muted-foreground);
+    z-index: 50;
+    opacity: 0.7;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+.keyboard-hint kbd {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.9em;
+    padding: 0.05em 0.4em;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--background);
+    margin: 0 0.15em;
+}
+
+/* ---------- Credit line ---------- */
+.chassis-credit {
+    position: fixed;
+    bottom: clamp(0.6rem, 1.2vh, 1rem);
+    left: clamp(1rem, 2vw, 1.5rem);
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--muted-foreground);
+    letter-spacing: 0.02em;
+    z-index: 50;
+    opacity: 0.7;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+.chassis-credit .chassis-credit-emoji {
+    font-style: normal;
+    margin: 0 0.15em;
+}
+
+body[data-nav="bottom"] .chassis-credit {
+    left: auto;
+    right: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* ---------- Custom cursor ---------- */
+.chassis-cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: var(--accent);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    will-change: transform;
+}
+.chassis-cursor.visible { opacity: 1; }
+body.artifact-editor-editing .chassis-cursor { display: none; }
+
+@media (hover: none) {
+    .chassis-cursor { display: none; }
+}
+
+body.chassis-cursor-active:not(.artifact-editor-editing),
+body.chassis-cursor-active:not(.artifact-editor-editing) * { cursor: none; }
+
+/* ---------- Opt-outs ---------- */
+body[data-no-chrome] .nav-dots,
+body[data-no-chrome] .keyboard-hint,
+body[data-no-chrome] .chassis-credit,
+body[data-no-chrome] .chassis-cursor,
+body[data-no-chrome] .artifact-editor-toggle { display: none; }
+
+:fullscreen .keyboard-hint,
+:fullscreen .chassis-credit,
+:fullscreen .artifact-editor-toggle { display: none; }
+
+@media (hover: none) {
+    .keyboard-hint,
+    .chassis-credit { display: none; }
+}
+
+@media (max-width: 900px), (max-height: 560px) {
+    .nav-dots,
+    .keyboard-hint,
+    .chassis-credit,
+    .chassis-cursor { display: none; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.2s !important;
+    }
+    html { scroll-behavior: auto; }
+}
+
+/* ---------- Print (PDF export) ---------- */
+@media print {
+    .nav-dots, .keyboard-hint, .chassis-credit, .chassis-cursor { display: none !important; }
+    html, body { height: auto; overflow: visible; }
+    html { scroll-snap-type: none; }
+    .slide-viewport {
+        page-break-after: always;
+        break-after: page;
+        height: 100vh;
+    }
+    .slide-scale {
+        position: static !important;
+        transform: none !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+    .slide {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
+
+</style>
+<script>
+/* =====================================================
+   PRESENTATION CHASSIS — slide controller
+   Auto-initializes on DOMContentLoaded.
+   Exposes window.slides for programmatic control.
+   ===================================================== */
+(function () {
+    'use strict';
+
+    const REVEAL_SELECTOR = '.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-blur';
+    const STEP_SELECTOR = '.step';
+    const ALL_REVEAL_SELECTOR = REVEAL_SELECTOR + ', ' + STEP_SELECTOR;
+    const VIEWPORT_CLASS = 'slide-viewport';
+    const SCALE_CLASS = 'slide-scale';
+
+    function _detectLang() {
+        const param = new URLSearchParams(location.search).get('lang');
+        return (param || navigator.language || 'en').slice(0, 2).toLowerCase();
+    }
+
+    class SlidePresentation {
+        constructor() {
+            this.slides = Array.from(document.querySelectorAll('.slide'));
+            if (this.slides.length === 0) return;
+
+            // Ensure every slide has an id so hashes + anchor links work.
+            // Author-defined ids are preserved; the rest get slide-N (1-indexed).
+            this.slides.forEach((slide, idx) => {
+                if (!slide.id) slide.id = `slide-${idx + 1}`;
+            });
+            this.viewports = this._setupViewports();
+            this.scales = this.viewports.map((viewport) => viewport.querySelector(`.${SCALE_CLASS}`));
+
+            // Hide every reveal element BEFORE lifting the CSS FOUC guard.
+            // After this, .reveals-ready is on <html>, so CSS no longer hides
+            // reveals — inline styles keep them hidden until JS animates them.
+            this._setupReveals();
+
+            this.navDotsContainer = this._ensureNavDots();
+            this.keyboardHint = this._ensureKeyboardHint();
+            this.credit = this._ensureCredit();
+
+            this._setupCanvasScale();
+            this._setupIntersectionObserver();
+            this._setupKeyboardNav();
+            this._setupWheelNav();
+            this._setupTouchNav();
+            this._setupViewportSync();
+            this._buildNavDots();
+            this._setupHashNav();
+            this._setupCursor();
+            this._setupPrintSettling();
+
+            // If URL has a matching hash, start there; otherwise start at slide 0.
+            const initial = this._slideIndexFromHash(location.hash);
+            this.currentSlide = initial >= 0 ? initial : 0;
+            if (this.currentSlide !== 0) {
+                this._scrollToSlide(this.currentSlide, 'auto');
+            }
+            // Reveal initial slide immediately (observer may miss it on load).
+            const first = this.slides[this.currentSlide];
+            first.classList.add('visible');
+            this._playSlideReveals(first);
+            this._updateNavDots();
+        }
+
+        /* ---------- Viewport scaffolding ----------
+           Authors write .slide as the 1920×1080 artboard. The chassis wraps
+           that authored section in viewport and scale layers. */
+        _setupViewports() {
+            return this.slides.map((slide) => {
+                const existingScale = slide.parentElement?.classList.contains(SCALE_CLASS)
+                    ? slide.parentElement
+                    : null;
+                const existingViewport = existingScale?.parentElement?.classList.contains(VIEWPORT_CLASS)
+                    ? existingScale.parentElement
+                    : null;
+                if (existingViewport) {
+                    this._syncViewportBackground(slide, existingViewport);
+                    return existingViewport;
+                }
+
+                const viewport = document.createElement('div');
+                viewport.className = VIEWPORT_CLASS;
+                const scale = document.createElement('div');
+                scale.className = SCALE_CLASS;
+
+                slide.parentNode.insertBefore(viewport, slide);
+                viewport.appendChild(scale);
+                scale.appendChild(slide);
+                this._syncViewportBackground(slide, viewport);
+
+                return viewport;
+            });
+        }
+
+        _syncViewportBackground(slide, viewport) {
+            const style = getComputedStyle(slide);
+            const hasBackgroundImage = style.backgroundImage && style.backgroundImage !== 'none';
+            const hasBackgroundColor = !['rgba(0, 0, 0, 0)', 'transparent'].includes(style.backgroundColor);
+            if (hasBackgroundImage || hasBackgroundColor) {
+                viewport.style.background = style.background;
+            } else {
+                viewport.style.background = '';
+            }
+            slide.style.background = 'transparent';
+        }
+
+        /* ---------- DOM scaffolding (auto-inserted if missing) ---------- */
+        _ensureNavDots() {
+            let el = document.getElementById('navDots');
+            if (!el) {
+                el = document.createElement('nav');
+                el.id = 'navDots';
+                el.className = 'nav-dots';
+                el.setAttribute('aria-label', 'Slide navigation');
+                document.body.appendChild(el);
+            }
+            return el;
+        }
+
+        _ensureKeyboardHint() {
+            let el = document.querySelector('.keyboard-hint');
+            if (!el) {
+                const i18n = {
+                    en: { navigate: 'navigate', restart: 'restart', fullscreen: 'fullscreen' },
+                    es: { navigate: 'navegar',   restart: 'inicio',   fullscreen: 'fullscreen' },
+                    fr: { navigate: 'naviguer',  restart: 'début',    fullscreen: 'fullscreen' },
+                    de: { navigate: 'blättern',  restart: 'anfang',   fullscreen: 'vollbild' },
+                    pt: { navigate: 'navegar',   restart: 'início',   fullscreen: 'fullscreen' },
+                    ja: { navigate: '移動',      restart: '先頭',      fullscreen: '全画面' },
+                    ko: { navigate: '이동',      restart: '처음',      fullscreen: '전체화면' },
+                    zh: { navigate: '翻页',      restart: '重置',      fullscreen: '全屏' },
+                    it: { navigate: 'navigare',  restart: 'inizio',   fullscreen: 'fullscreen' },
+                    nl: { navigate: 'bladeren',  restart: 'begin',    fullscreen: 'vollscherm' },
+                };
+                const t = i18n[_detectLang()] || i18n.en;
+                el = document.createElement('div');
+                el.className = 'keyboard-hint';
+                el.innerHTML = `<kbd>←</kbd> <kbd>→</kbd> ${t.navigate} &middot; <kbd>R</kbd> ${t.restart} &middot; <kbd>F</kbd> ${t.fullscreen}`;
+                document.body.appendChild(el);
+            }
+            return el;
+        }
+
+        _ensureCredit() {
+            let el = document.querySelector('.chassis-credit');
+            if (!el) {
+                el = document.createElement('div');
+                el.className = 'chassis-credit';
+                el.setAttribute('aria-hidden', 'true');
+                el.innerHTML = '💜 by ClickUp Brain';
+                document.body.appendChild(el);
+            }
+            return el;
+        }
+
+        /* ---------- Reveal engine ----------
+           Reveals are driven by the Web Animations API instead of CSS
+           transitions. This lets authors put .reveal* / .step on any
+           element: animation values live in the animation cascade origin
+           and win over normal author declarations, so no wrapper element
+           is required to isolate the chassis from author CSS.
+
+           State per slide:
+           - "hidden":  inline opacity/transform/filter from the 'from'
+                        keyframe of the variant. Set on init and on
+                        forward re-entry.
+           - "played":  animation is running or has run; the class
+                        `reveals-played` on the slide makes playback
+                        idempotent so observer re-fires (resize,
+                        fullscreen) don't restart the animation.
+           - "settled": animation canceled, inline styles cleared. Used
+                        for backward entries (we skip the animation and
+                        show the final state instantly) and for print. */
+
+        _setupReveals() {
+            // Lift the CSS FOUC guard first so getComputedStyle reads each
+            // element's natural opacity, not the guard's blanket opacity: 0.
+            // No paint occurs mid-task — inline hidden styles are applied
+            // before the browser yields, so there is no visible flash.
+            document.documentElement.classList.add('reveals-ready');
+            this.slides.forEach((slide) => {
+                slide.querySelectorAll(ALL_REVEAL_SELECTOR).forEach((el) => {
+                    el._targetOpacity = parseFloat(getComputedStyle(el).opacity);
+                    this._applyHiddenStyle(el);
+                });
+            });
+        }
+
+        _setupPrintSettling() {
+            // Browsers snapshot the document for print/PDF export. WAAPI
+            // animations don't necessarily complete in that snapshot, so
+            // settle every slide to its final state first. After printing,
+            // reset — but only for slides that haven't already been viewed,
+            // so the audience experience picks up where it left off.
+            window.addEventListener('beforeprint', () => {
+                this.slides.forEach((slide) => this._settleSlide(slide));
+            });
+        }
+
+        _readTokens() {
+            const cs = getComputedStyle(document.documentElement);
+            const rawDuration = parseFloat(cs.getPropertyValue('--reveal-duration'));
+            const duration = Number.isFinite(rawDuration) ? rawDuration * 1000 : 800;
+            const ease = cs.getPropertyValue('--reveal-ease').trim() || 'cubic-bezier(0.16, 1, 0.3, 1)';
+            const distance = cs.getPropertyValue('--reveal-distance').trim() || '28px';
+            const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            return {
+                duration: reducedMotion ? 1 : duration,
+                ease,
+                distance,
+            };
+        }
+
+        _getRevealDelay(el) {
+            // Use getAttribute('class') rather than el.className: on SVG
+            // elements, `.className` is an SVGAnimatedString (not a string)
+            // and calling .match on it throws. getAttribute is uniform
+            // across HTML and SVG.
+            const classes = el.getAttribute('class') || '';
+            const m = classes.match(/\bd([1-8])\b/);
+            if (!m) return 0;
+            // Matches CSS .dN: d1 = 100ms, d2 = 250ms, +150ms per step.
+            return 100 + (parseInt(m[1], 10) - 1) * 150;
+        }
+
+        _getRevealKeyframes(el, distance) {
+            const to = el._targetOpacity ?? 1;
+            if (el.classList.contains('reveal-left')) {
+                return [
+                    { opacity: 0, transform: `translateX(calc(-1 * ${distance}))` },
+                    { opacity: to, transform: 'translateX(0)' },
+                ];
+            }
+            if (el.classList.contains('reveal-right')) {
+                return [
+                    { opacity: 0, transform: `translateX(${distance})` },
+                    { opacity: to, transform: 'translateX(0)' },
+                ];
+            }
+            if (el.classList.contains('reveal-scale')) {
+                return [
+                    { opacity: 0, transform: 'scale(0.88)' },
+                    { opacity: to, transform: 'scale(1)' },
+                ];
+            }
+            if (el.classList.contains('reveal-blur')) {
+                return [
+                    { opacity: 0, filter: 'blur(10px)' },
+                    { opacity: to, filter: 'blur(0)' },
+                ];
+            }
+            // Default: .reveal or .step (slide up + fade)
+            return [
+                { opacity: 0, transform: `translateY(${distance})` },
+                { opacity: to, transform: 'translateY(0)' },
+            ];
+        }
+
+        _applyHiddenStyle(el) {
+            const { distance } = this._readTokens();
+            const from = this._getRevealKeyframes(el, distance)[0];
+            if ('opacity' in from) el.style.opacity = from.opacity;
+            if ('transform' in from) el.style.transform = from.transform;
+            if ('filter' in from) el.style.filter = from.filter;
+        }
+
+        _clearHiddenStyle(el) {
+            el.style.opacity = '';
+            el.style.transform = '';
+            el.style.filter = '';
+        }
+
+        _cancelReveal(el) {
+            if (el._revealAnim) {
+                el._revealAnim.cancel();
+                el._revealAnim = null;
+            }
+        }
+
+        _playReveal(el, delayOverride) {
+            this._cancelReveal(el);
+            const { duration, ease, distance } = this._readTokens();
+            const delay = typeof delayOverride === 'number' ? delayOverride : this._getRevealDelay(el);
+            const keyframes = this._getRevealKeyframes(el, distance);
+            // fill: 'backwards' applies the 'from' keyframe during the
+            // stagger delay so the element stays hidden until its turn,
+            // without pinning the 'to' keyframe after the animation ends.
+            // This lets co-existing author CSS (e.g. a `.pulse` CSS
+            // animation on the same element) take over naturally once the
+            // entrance completes — otherwise our fill would mask anything
+            // the author wanted to happen post-reveal.
+            const anim = el.animate(keyframes, {
+                duration,
+                delay,
+                easing: ease,
+                fill: 'backwards',
+            });
+            el._revealAnim = anim;
+            // Safe to clear inline 'from' styles now — the animation's
+            // backwards-fill holds the element at the 'from' keyframe for
+            // the duration of any stagger delay.
+            this._clearHiddenStyle(el);
+        }
+
+        _playSlideReveals(slide) {
+            if (slide.classList.contains('reveals-played')) return;
+            slide.classList.add('reveals-played');
+            slide.querySelectorAll(REVEAL_SELECTOR).forEach((el) => this._playReveal(el));
+            // .step elements stay hidden until the user advances.
+        }
+
+        _resetSlideReveals(slide) {
+            // Forward re-entry: cancel in-flight animations, re-hide
+            // everything, and reset step state so the slide replays cleanly
+            // when the observer next adds .visible.
+            slide.classList.remove('reveals-played');
+            slide.querySelectorAll(ALL_REVEAL_SELECTOR).forEach((el) => {
+                this._cancelReveal(el);
+                this._applyHiddenStyle(el);
+            });
+            slide.querySelectorAll('.step.step-shown').forEach((el) => el.classList.remove('step-shown'));
+        }
+
+        _settleSlide(slide) {
+            // Print / PDF export: jump to the final state with everything
+            // shown, so every step appears in the exported document.
+            slide.classList.add('reveals-played');
+            slide.querySelectorAll(ALL_REVEAL_SELECTOR).forEach((el) => {
+                this._cancelReveal(el);
+                this._clearHiddenStyle(el);
+            });
+            slide.querySelectorAll('.step').forEach((el) => el.classList.add('step-shown'));
+        }
+
+        _rewindSlide(slide) {
+            // Backward re-entry: show reveals instantly (no replay — the
+            // viewer already saw the intro) but hide every step, so the
+            // slide is positioned at the start of its stepped content and
+            // can be stepped through again.
+            slide.classList.add('reveals-played');
+            slide.querySelectorAll(REVEAL_SELECTOR).forEach((el) => {
+                this._cancelReveal(el);
+                this._clearHiddenStyle(el);
+            });
+            slide.querySelectorAll('.step').forEach((el) => {
+                el.classList.remove('step-shown');
+                this._cancelReveal(el);
+                this._applyHiddenStyle(el);
+            });
+        }
+
+        /* ---------- Navigation ----------
+           goTo scrolls to the target. Both forward-replay and backward-
+           rewind need to mutate the target BEFORE scrolling — while it's
+           still offscreen — so the viewer never sees the old state flash
+           into view. Resetting after the slide is in view causes a visible
+           "show then hide" blink; the IntersectionObserver fires too late
+           (80% threshold) to catch it. */
+        goTo(index) {
+            const clamped = Math.max(0, Math.min(this.slides.length - 1, index));
+            if (clamped === this.currentSlide) return;
+
+            const target = this.slides[clamped];
+            const goingForward = clamped > this.currentSlide;
+
+            if (target.classList.contains('visible')) {
+                if (goingForward) {
+                    // Forward replay: full reset so the observer can play reveals fresh.
+                    target.classList.remove('visible');
+                    this._resetSlideReveals(target);
+                } else {
+                    // Backward rewind: hide any shown steps so the slide
+                    // scrolls back in at the start of its stepped content.
+                    this._rewindSlide(target);
+                }
+            }
+
+            this._scrollToSlide(clamped, 'smooth');
+        }
+
+        _scrollToSlide(index, behavior) {
+            this.viewports[index]?.scrollIntoView({ behavior, block: 'start' });
+        }
+
+        _slideIndexFromHash(hash) {
+            if (!hash) return -1;
+            return this.slides.findIndex((s) => '#' + s.id === hash);
+        }
+
+        _syncHash() {
+            const slide = this.slides[this.currentSlide];
+            if (!slide || !slide.id) return;
+            const newHash = '#' + slide.id;
+            if (location.hash !== newHash) {
+                // replaceState — keeps the URL in sync without polluting history,
+                // so the browser back button exits the deck instead of stepping through slides.
+                try {
+                    history.replaceState(null, '', newHash);
+                } catch {
+                    // Sandboxed iframes (opaque origin, about:srcdoc) reject URL
+                    // mutation with a SecurityError. Hash sync is a nicety — an
+                    // unguarded throw here kills the observer callback before it
+                    // marks the slide visible and plays its reveals.
+                }
+            }
+        }
+
+        _setupHashNav() {
+            // React to external hash changes (anchor link clicks, back/forward if user uses pushState manually)
+            window.addEventListener('hashchange', () => {
+                const idx = this._slideIndexFromHash(location.hash);
+                if (idx >= 0 && idx !== this.currentSlide) this.goTo(idx);
+            });
+        }
+
+        /* ---------- Custom cursor ----------
+           Accent disc that follows the pointer, hidden after idle. */
+        _setupCursor() {
+            if (!matchMedia('(hover: hover)').matches) return;
+
+            const cursor = document.createElement('div');
+            cursor.className = 'chassis-cursor';
+            cursor.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(cursor);
+            document.body.classList.add('chassis-cursor-active');
+
+            const half = 16;  // matches width/height / 2 in CSS
+            const IDLE_MS = 2500;
+            let idleTimer = null;
+
+            const show = () => {
+                cursor.classList.add('visible');
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(() => {
+                    cursor.classList.remove('visible');
+                }, IDLE_MS);
+            };
+            const hide = () => {
+                clearTimeout(idleTimer);
+                cursor.classList.remove('visible');
+            };
+
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.transform = `translate3d(${e.clientX - half}px, ${e.clientY - half}px, 0)`;
+                show();
+            });
+            document.addEventListener('mouseleave', hide);
+            document.addEventListener('mouseenter', show);
+        }
+
+        /* ---------- Fullscreen ---------- */
+        toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen?.().catch(() => {});
+            } else {
+                document.exitFullscreen?.();
+            }
+        }
+
+        next() { this.goTo(this.currentSlide + 1); }
+        prev() { this.goTo(this.currentSlide - 1); }
+        first() { this.goTo(0); }
+        last() { this.goTo(this.slides.length - 1); }
+
+        /* ---------- Step-aware advance / retreat ----------
+           advance() reveals the next .step on the current slide (if any),
+           otherwise advances to the next slide. retreat() hides the last
+           revealed step, otherwise goes back to the previous slide. */
+        advance() {
+            const current = this.slides[this.currentSlide];
+            const nextStep = current?.querySelector('.step:not(.step-shown)');
+            if (nextStep) {
+                nextStep.classList.add('step-shown');
+                // No stagger on click-reveal — the user's gesture is the trigger.
+                this._playReveal(nextStep, 0);
+                return;
+            }
+            this.next();
+        }
+        retreat() {
+            const current = this.slides[this.currentSlide];
+            const shown = current?.querySelectorAll('.step.step-shown');
+            if (shown && shown.length > 0) {
+                const last = shown[shown.length - 1];
+                last.classList.remove('step-shown');
+                this._cancelReveal(last);
+                this._applyHiddenStyle(last);
+                return;
+            }
+            this.prev();
+        }
+
+        /* ---------- Intersection observer ----------
+           Fire late (>= 80% in view) so reveals play on a settled slide.
+           This is the single source of truth for active-slide state.
+
+           Forward:  add .visible, play reveals. (goTo() has already reset
+                     the target to pre-reveal state if this is a re-visit,
+                     so the animation is fresh either way.)
+           Backward: add .visible, rewind to the start of the stepped
+                     content — reveals are shown instantly (no replay) and
+                     every step is hidden again so the viewer can step
+                     through it fresh. */
+        _setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    const idx = this.viewports.indexOf(entry.target);
+                    if (idx < 0) return;
+                    const slide = this.slides[idx];
+
+                    if (idx === this.currentSlide) {
+                        // Same-slide re-fire (initial load, resize, fullscreen).
+                        if (!slide.classList.contains('visible')) {
+                            slide.classList.add('visible');
+                        }
+                        // Idempotent: only plays if not already marked played.
+                        this._playSlideReveals(slide);
+                        return;
+                    }
+
+                    const goingForward = idx > this.currentSlide;
+                    this.currentSlide = idx;
+                    this._updateNavDots();
+                    this._syncHash();
+
+                    slide.classList.add('visible');
+                    if (goingForward) {
+                        this._playSlideReveals(slide);
+                    } else {
+                        this._rewindSlide(slide);
+                    }
+                });
+            }, { threshold: 0.8 });
+
+            this.viewports.forEach((viewport) => observer.observe(viewport));
+        }
+
+        /* ---------- Keyboard ---------- */
+        _setupKeyboardNav() {
+            document.addEventListener('keydown', (e) => {
+                // Skip when user is editing text
+                if (e.target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+
+                switch (e.key) {
+                    // Step-aware: consume steps first, then advance slides
+                    case 'ArrowDown':
+                    case 'ArrowRight':
+                    case ' ':
+                        e.preventDefault(); this.advance(); break;
+                    case 'ArrowUp':
+                    case 'ArrowLeft':
+                        e.preventDefault(); this.retreat(); break;
+                    // Slide-level: always skip past steps
+                    case 'PageDown':
+                        e.preventDefault(); this.next(); break;
+                    case 'PageUp':
+                        e.preventDefault(); this.prev(); break;
+                    case 'Home':
+                        e.preventDefault(); this.first(); break;
+                    case 'End':
+                        e.preventDefault(); this.last(); break;
+                    case 'f':
+                    case 'F':
+                        e.preventDefault(); this.toggleFullscreen(); break;
+                    case 'r':
+                    case 'R':
+                        e.preventDefault(); this.first(); break;
+                }
+            });
+        }
+
+        /* ---------- Wheel / trackpad ----------
+           ALWAYS preventDefault — letting any native wheel scroll through
+           races against scrollIntoView + mandatory snap, and blocks macOS
+           two-finger horizontal swipes from triggering browser back/forward.
+           Whichever axis has the larger magnitude wins, so vertical scroll
+           and horizontal trackpad swipes both drive advance/retreat. Lock
+           briefly after a gesture so trackpad inertia (continuous small
+           deltas) can't spam next(). */
+        _setupWheelNav() {
+            let locked = false;
+            window.addEventListener('wheel', (e) => {
+                if (e.ctrlKey) return;                // preserve browser pinch-zoom (ctrl+wheel)
+                e.preventDefault();                   // block native scroll + horizontal back-swipe
+                if (locked) return;
+                const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+                if (Math.abs(delta) < 20) return;     // ignore tiny flicks
+                locked = true;
+                if (delta > 0) this.advance(); else this.retreat();
+                setTimeout(() => { locked = false; }, 500);
+            }, { passive: false });
+        }
+
+        /* ---------- Touch / swipe ----------
+           Horizontal swipes advance / retreat slides; left = next, right =
+           prev (matches stories / carousel conventions). Dominantly
+           vertical swipes fall through to native scroll-snap so the
+           existing top/bottom behavior keeps working. A time budget
+           rejects slow pans that were really aborted scrolls. */
+        _setupTouchNav() {
+            const MIN_DISTANCE = 50;     // px — below this is a tap or jitter
+            const MAX_TIME = 600;        // ms — slower than this is a pan, not a swipe
+            const DOMINANCE = 1.2;       // horizontal must beat vertical by this factor
+
+            let startX = 0, startY = 0, startTime = 0;
+            let tracking = false;
+
+            window.addEventListener('touchstart', (e) => {
+                if (document.body.classList.contains('artifact-editor-editing')) { tracking = false; return; }
+                if (e.touches.length !== 1) { tracking = false; return; }
+                const t = e.touches[0];
+                startX = t.clientX;
+                startY = t.clientY;
+                startTime = performance.now();
+                tracking = true;
+            }, { passive: true });
+
+            window.addEventListener('touchend', (e) => {
+                if (!tracking) return;
+                tracking = false;
+                const t = e.changedTouches[0];
+                const dx = t.clientX - startX;
+                const dy = t.clientY - startY;
+                const ax = Math.abs(dx), ay = Math.abs(dy);
+                if (ax < MIN_DISTANCE) return;
+                if (ax < ay * DOMINANCE) return;
+                if (performance.now() - startTime > MAX_TIME) return;
+                if (dx < 0) this.advance(); else this.retreat();
+            }, { passive: true });
+
+            window.addEventListener('touchcancel', () => { tracking = false; }, { passive: true });
+        }
+
+        /* ---------- Canvas scaling ----------
+           Each scaler holds a fixed 1920×1080 slide. Compute the
+           scale factor that fits it inside the viewport and apply via
+           CSS custom property. Runs on init, resize, and fullscreen. */
+        _setupCanvasScale() {
+            const CANVAS_W = 1920;
+            const CANVAS_H = 1080;
+            const scales = this.scales;
+
+            const update = () => {
+                const scale = Math.min(
+                    window.innerWidth / CANVAS_W,
+                    window.innerHeight / CANVAS_H
+                );
+                scales.forEach((el) => {
+                    el?.style.setProperty('--slide-scale', scale);
+                });
+            };
+
+            update();
+            window.addEventListener('resize', update);
+            document.addEventListener('fullscreenchange', () => {
+                requestAnimationFrame(update);
+            });
+        }
+
+        /* ---------- Viewport sync ----------
+           Resize / fullscreenchange → realign current slide. Each slide is
+           100vh, so a viewport height change leaves the existing scroll
+           position out of alignment with the slide top; scroll-snap doesn't
+           re-snap on its own. */
+        _setupViewportSync() {
+            const realign = () => {
+                requestAnimationFrame(() => {
+                    this._scrollToSlide(this.currentSlide, 'auto');
+                });
+            };
+            window.addEventListener('resize', realign);
+            document.addEventListener('fullscreenchange', realign);
+        }
+
+        /* ---------- Nav dots ---------- */
+        _buildNavDots() {
+            // Clear first — prevents duplicates when DOM is re-serialized/re-opened
+            this.navDotsContainer.innerHTML = '';
+            this.slides.forEach((slide, idx) => {
+                const dot = document.createElement('button');
+                dot.setAttribute('aria-label', `Go to slide ${idx + 1}`);
+                if (idx === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => this.goTo(idx));
+                this.navDotsContainer.appendChild(dot);
+            });
+        }
+
+        _updateNavDots() {
+            const dots = this.navDotsContainer.querySelectorAll('button');
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === this.currentSlide);
+            });
+        }
+    }
+
+    /* ---------- Auto-init ---------- */
+    function init() {
+        // Each slide canvas is its own editable host for the inline editor.
+        document.querySelectorAll('.slide').forEach(function (el) {
+            el.classList.add('artifact-editable');
+        });
+        window.slides = new SlidePresentation();
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+</script>
+<!-- /skill:chassis -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuantumPilot AI - Progress Milestone Presentation</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Tajawal:wght@300;400;500;700;800;900&display=swap" />
+
+    <style>
+      :root {
+        --background:        #fafafa;
+        --foreground:        #0a0a0a;
+        --card:              #0a0a0a;
+        --card-foreground:   #ffffff;
+        --accent:            #00b4d8;
+        --accent-foreground: #ffffff;
+        --accent-secondary:  #7209b7;
+        --border:            color-mix(in srgb, var(--foreground) 10%, transparent);
+        --font-display: 'Tajawal', 'Manrope', sans-serif;
+        --font-body: 'Tajawal', 'Manrope', sans-serif;
+        --font-mono: 'IBM Plex Mono', monospace;
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      h1, h2, h3 { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.01em; }
+      p, li { font-family: var(--font-body); font-weight: 400; }
+      .mono { font-family: var(--font-mono); font-size: 20px; color: var(--accent); }
+
+      .slide {
+        padding: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Title Slide */
+      .title-slide {
+        background: var(--card);
+        color: var(--card-foreground);
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+      }
+      .title-slide h1 {
+        font-size: 120px;
+        line-height: 1.1;
+        margin-bottom: 30px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .title-slide .subtitle {
+        font-size: 36px;
+        font-weight: 400;
+        color: rgba(255,255,255,0.7);
+        max-width: 900px;
+      }
+      .title-slide .team {
+        margin-top: 60px;
+        font-size: 24px;
+        color: rgba(255,255,255,0.5);
+      }
+      .title-slide::before {
+        content: '';
+        position: absolute;
+        top: -200px; right: -200px;
+        width: 600px; height: 600px;
+        background: radial-gradient(circle, color-mix(in srgb, var(--accent) 15%, transparent), transparent 70%);
+        border-radius: 50%;
+        animation: pulse-glow 8s ease-in-out infinite;
+      }
+      .title-slide::after {
+        content: '';
+        position: absolute;
+        bottom: -200px; left: -200px;
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, color-mix(in srgb, var(--accent-secondary) 12%, transparent), transparent 70%);
+        border-radius: 50%;
+        animation: pulse-glow 8s ease-in-out infinite 3s;
+      }
+      @keyframes pulse-glow {
+        0%, 100% { opacity: 0.6; transform: scale(0.9); }
+        50% { opacity: 1; transform: scale(1.15); }
+      }
+
+      /* Dark slides */
+      .dark-slide {
+        background: var(--card);
+        color: var(--card-foreground);
+      }
+      .dark-slide h2 { color: #ffffff; }
+      .dark-slide p, .dark-slide li { color: rgba(255,255,255,0.75); }
+      .dark-slide .accent-text { color: var(--accent); }
+
+      /* Light slides */
+      .light-slide {
+        background: var(--background);
+        color: var(--foreground);
+      }
+
+      /* Split slides */
+      .split-slide {
+        flex-direction: row;
+        padding: 0;
+        gap: 0;
+      }
+      .split-left {
+        width: 45%;
+        background: var(--card);
+        color: var(--card-foreground);
+        padding: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .split-right {
+        width: 55%;
+        background: var(--background);
+        padding: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* Content styles */
+      h2 { font-size: 64px; line-height: 1.1; margin-bottom: 40px; }
+      h3 { font-size: 44px; line-height: 1.2; margin-bottom: 30px; }
+      p { font-size: 32px; line-height: 1.5; max-width: 800px; color: color-mix(in srgb, var(--foreground) 75%, transparent); }
+
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 22px;
+        color: var(--accent);
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+        margin-top: 40px;
+      }
+      .stat-card {
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+        border-radius: 16px;
+        padding: 40px 30px;
+        text-align: center;
+      }
+      .stat-card .number {
+        font-size: 72px;
+        font-weight: 800;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .stat-card .label {
+        font-size: 22px;
+        margin-top: 12px;
+        color: color-mix(in srgb, var(--foreground) 60%, transparent);
+      }
+
+      /* Dark stat cards */
+      .dark-slide .stat-card {
+        background: rgba(255,255,255,0.05);
+        border-color: rgba(255,255,255,0.1);
+      }
+      .dark-slide .stat-card .label { color: rgba(255,255,255,0.6); }
+
+      /* Comparison table */
+      .comparison-table {
+        width: 100%;
+        margin-top: 30px;
+        border-collapse: collapse;
+        font-size: 26px;
+      }
+      .comparison-table th {
+        text-align: right;
+        padding: 16px 20px;
+        font-weight: 700;
+        color: var(--accent);
+        border-bottom: 2px solid var(--accent);
+      }
+      .comparison-table td {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .comparison-table .check { color: #22c55e; font-size: 28px; }
+      .comparison-table .cross { color: #ef4444; font-size: 28px; }
+
+      .dark-slide .comparison-table td { border-bottom-color: rgba(255,255,255,0.1); }
+
+      /* Flow diagram */
+      .flow {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-top: 40px;
+        flex-wrap: wrap;
+      }
+      .flow-box {
+        background: color-mix(in srgb, var(--accent) 10%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+        border-radius: 12px;
+        padding: 20px 28px;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .flow-arrow {
+        font-size: 32px;
+        color: var(--accent);
+      }
+      .dark-slide .flow-box {
+        background: rgba(0,180,216,0.1);
+        border-color: rgba(0,180,216,0.3);
+        color: #fff;
+      }
+
+      /* Lists */
+      ul { list-style: none; margin-top: 20px; }
+      ul li {
+        font-size: 30px;
+        line-height: 1.6;
+        padding-right: 30px;
+        position: relative;
+        margin-bottom: 16px;
+      }
+      ul li::before {
+        content: '▸';
+        position: absolute;
+        right: 0;
+        color: var(--accent);
+        font-weight: bold;
+      }
+
+      /* Speaker indicator */
+      .speaker-tag {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        background: var(--accent);
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-family: var(--font-body);
+        z-index: 10;
+      }
+
+      /* Architecture diagram */
+      .arch-container {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        margin-top: 30px;
+        align-items: center;
+      }
+      .arch-layer {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+      .arch-box {
+        background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 15%, transparent), color-mix(in srgb, var(--accent-secondary) 10%, transparent));
+        border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+        border-radius: 12px;
+        padding: 18px 28px;
+        font-size: 22px;
+        font-weight: 600;
+        text-align: center;
+        min-width: 180px;
+      }
+      .arch-arrow-down {
+        font-size: 36px;
+        color: var(--accent);
+        text-align: center;
+      }
+
+      .dark-slide .arch-box {
+        background: linear-gradient(135deg, rgba(0,180,216,0.12), rgba(114,9,183,0.08));
+        border-color: rgba(0,180,216,0.3);
+        color: #fff;
+      }
+
+      /* Highlight box */
+      .highlight-box {
+        background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), color-mix(in srgb, var(--accent-secondary) 8%, transparent));
+        border-right: 4px solid var(--accent);
+        border-radius: 12px;
+        padding: 30px 40px;
+        margin-top: 30px;
+      }
+      .highlight-box p { font-size: 28px; max-width: 100%; }
+
+      .dark-slide .highlight-box {
+        background: linear-gradient(135deg, rgba(0,180,216,0.08), rgba(114,9,183,0.06));
+        border-right-color: var(--accent);
+      }
+
+      /* Big number */
+      .big-number {
+        font-size: 200px;
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+      }
+
+      /* Slide number */
+      .slide-num {
+        position: absolute;
+        bottom: 30px;
+        left: 30px;
+        font-family: var(--font-mono);
+        font-size: 18px;
+        color: color-mix(in srgb, var(--foreground) 30%, transparent);
+      }
+      .dark-slide .slide-num { color: rgba(255,255,255,0.3); }
+
+      /* References */
+      .ref-list {
+        columns: 2;
+        column-gap: 60px;
+        font-size: 22px;
+        line-height: 2;
+      }
+      .ref-list li { margin-bottom: 8px; }
+      .ref-list li::before { content: ''; }
+
+      /* Results bar chart */
+      .bar-chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 30px;
+        height: 300px;
+        margin-top: 40px;
+        padding-top: 20px;
+      }
+      .bar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+      }
+      .bar {
+        width: 80px;
+        border-radius: 8px 8px 0 0;
+        transition: height 1s ease;
+      }
+      .bar-label {
+        margin-top: 12px;
+        font-size: 20px;
+        text-align: center;
+        font-weight: 600;
+      }
+      .bar-value {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: var(--accent);
+      }
+
+      /* QA slide */
+      .qa-slide {
+        background: var(--card);
+        color: var(--card-foreground);
+        align-items: center;
+        text-align: center;
+      }
+      .qa-slide h1 {
+        font-size: 140px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    </style>
+</head>
+<body>
+
+    <!-- ============ SLIDE 1: TITLE ============ -->
+    <section class="slide title-slide">
+      <span class="speaker-tag reveal d1">المقدم ١</span>
+      <h1 class="reveal d2">QuantumPilot AI</h1>
+      <p class="subtitle reveal d3">محرك قرار ذاتي قائم على NeuralUCB للتنفيذ التكيفي على الحواسيب الكمية</p>
+      <p class="subtitle reveal d4" style="font-size: 28px; margin-top: 20px; color: rgba(255,255,255,0.5);">NeuralUCB-Based Autonomous Decision Engine for Adaptive Quantum Execution</p>
+      <div class="team reveal d5">Progress Milestone Presentation • July 2026</div>
+      <span class="slide-num">01/20</span>
+    </section>
+
+    <!-- ============ SLIDE 2: WHAT IS IT ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ١</span>
+      <span class="eyebrow reveal d1">INTRODUCTION</span>
+      <h2 class="reveal d2">ما هو QuantumPilot AI؟</h2>
+      <p class="reveal d3" style="color: rgba(255,255,255,0.8); font-size: 34px;">منصة ذكاء اصطناعي تعمل كـ <span class="accent-text">Autopilot</span> للحاسوب الكمي.<br>تدير دورة التنفيذ الكاملة من إدخال الدائرة إلى النتيجة النهائية.</p>
+      <div class="flow reveal d4">
+        <div class="flow-box">Circuit Input</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-box">AI Decision</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-box">Execution</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-box">Learning</div>
+      </div>
+      <span class="slide-num">02/20</span>
+    </section>
+
+    <!-- ============ SLIDE 3: THE PROBLEM ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ١</span>
+      <span class="eyebrow reveal d1">PROBLEM STATEMENT</span>
+      <h2 class="reveal d2">المشكلة: هدر 70% من وقت الحوسبة الكمية</h2>
+      <ul>
+        <li class="step">أجهزة IBM Quantum تعاني من Noise عالي وتحتاج ضبط يدوي معقد</li>
+        <li class="step">اختيار Backend يتم بناءً على Queue فقط (Least Busy) بدون مراعاة صحة الكيوبت</li>
+        <li class="step">لا توجد أداة واحدة تدير: Backend Selection + Optimization + Error Mitigation + Monitoring</li>
+        <li class="step">لا يوجد اعتبار للطقس الفضائي رغم تأثيره المُثبت على T1</li>
+      </ul>
+      <span class="slide-num">03/20</span>
+    </section>
+
+    <!-- ============ SLIDE 4: PROBLEM QUANTIFIED ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ١</span>
+      <span class="eyebrow reveal d1">THE COST OF THE PROBLEM</span>
+      <h2 class="reveal d2">تأثير المشكلة بالأرقام</h2>
+      <div class="stat-grid reveal d3">
+        <div class="stat-card">
+          <div class="number">70%</div>
+          <div class="label">هدر في وقت الحوسبة</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">5×</div>
+          <div class="label">تكلفة ZNE التقليدي</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">40%</div>
+          <div class="label">انخفاض T1 وقت العواصف الشمسية</div>
+        </div>
+      </div>
+      <span class="slide-num">04/20</span>
+    </section>
+
+    <!-- ============ SLIDE 5: LITERATURE REVIEW ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٢</span>
+      <span class="eyebrow reveal d1">LITERATURE REVIEW</span>
+      <h2 class="reveal d2">الأدوات الحالية: كل أداة تحل جزءاً فقط</h2>
+      <table class="comparison-table reveal d3">
+        <tr>
+          <th>الأداة</th>
+          <th>Backend Selection</th>
+          <th>Error Mitigation</th>
+          <th>AI Decision</th>
+          <th>Space Weather</th>
+          <th>Cost Opt.</th>
+        </tr>
+        <tr>
+          <td><strong>IBM Runtime</strong></td>
+          <td><span class="check">✓</span> Least Busy</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td><strong>Mitiq</strong></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td><strong>Qedma</strong></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span> Noise Only</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td><strong style="color: var(--accent);">QuantumPilot AI</strong></td>
+          <td><span class="check">✓</span> NeuralUCB</td>
+          <td><span class="check">✓</span> S-ZNE</td>
+          <td><span class="check">✓</span> 22-D</td>
+          <td><span class="check">✓</span> NOAA</td>
+          <td><span class="check">✓</span> 76%</td>
+        </tr>
+      </table>
+      <span class="slide-num">05/20</span>
+    </section>
+
+    <!-- ============ SLIDE 6: RELATED WORK DETAIL ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٢</span>
+      <span class="eyebrow reveal d1">RELATED WORK</span>
+      <h2 class="reveal d2">الأعمال البحثية السابقة</h2>
+      <ul>
+        <li class="step"><strong>Q-LEAR (2023):</strong> Circuit features لتصنيف الأداء، لكن بدون اتخاذ قرار ذكي</li>
+        <li class="step"><strong>S-ZNE - Weiyou Liao (2024):</strong> تقليل الأخطاء بتكلفة 1.2× بدلاً من 5×، لكن بدون integration</li>
+        <li class="step"><strong>NeuralUCB - Zhou et al. (2020):</strong> Contextual Bandit عميق، لم يُطبق على Quantum</li>
+        <li class="step"><strong>Nature 2025:</strong> Noise-agnostic mitigation، أداة مستقلة بدون orchestration</li>
+      </ul>
+      <div class="highlight-box reveal d5">
+        <p><strong>الفجوة البحثية:</strong> لا يوجد نظام متكامل يجمع بين الاختيار الذكي + التخفيف الاقتصادي + الوعي البيئي + التعلم المستمر</p>
+      </div>
+      <span class="slide-num">06/20</span>
+    </section>
+
+    <!-- ============ SLIDE 7: RESEARCH GAP ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٢</span>
+      <span class="eyebrow reveal d1">RESEARCH GAP</span>
+      <h2 class="reveal d2">المساهمات الجديدة (Novel Contributions)</h2>
+      <ul>
+        <li class="step"><strong>أول استخدام لـ NeuralUCB</strong> في اختيار Backend كمي متعدد الأهداف</li>
+        <li class="step"><strong>أول ربط موثق</strong> بين الطقس الفضائي (Kp-index) وأداء الكيوبت</li>
+        <li class="step"><strong>LSTM Drift Predictor</strong> للتنبؤ بتدهور T1 الزمني</li>
+        <li class="step"><strong>S-ZNE Integration</strong> مع توفير 76% في التكلفة مُثبت تجريبياً</li>
+      </ul>
+      <span class="slide-num">07/20</span>
+    </section>
+
+    <!-- ============ SLIDE 8: PROPOSED METHOD OVERVIEW ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٣</span>
+      <span class="eyebrow reveal d1">PROPOSED METHOD</span>
+      <h2 class="reveal d2">المعمارية الشاملة (System Architecture)</h2>
+      <div class="arch-container reveal d3">
+        <div class="arch-layer">
+          <div class="arch-box">Circuit Input (QASM/Qiskit)</div>
+        </div>
+        <div class="arch-arrow-down">↓</div>
+        <div class="arch-layer">
+          <div class="arch-box">Circuit Analyzer<br><small>Q-LEAR Features</small></div>
+          <div class="arch-box">Backend Repo<br><small>Live T1/T2/CZ</small></div>
+          <div class="arch-box">Space Weather<br><small>NOAA Live</small></div>
+        </div>
+        <div class="arch-arrow-down">↓</div>
+        <div class="arch-layer">
+          <div class="arch-box" style="border-color: var(--accent); border-width: 2px;">LSTM Predictor → 22-D Context → NeuralUCB Engine</div>
+        </div>
+        <div class="arch-arrow-down">↓</div>
+        <div class="arch-layer">
+          <div class="arch-box">Decision: Backend + Opt Level + Mitigation (S-ZNE)</div>
+        </div>
+        <div class="arch-arrow-down">↓</div>
+        <div class="arch-layer">
+          <div class="arch-box">Qiskit Runtime Execution</div>
+          <div class="arch-box">Reward → Learning Update</div>
+        </div>
+      </div>
+      <span class="slide-num">08/20</span>
+    </section>
+
+    <!-- ============ SLIDE 9: NEURALUCB ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٣</span>
+      <span class="eyebrow reveal d1">CORE AI ENGINE</span>
+      <h2 class="reveal d2">NeuralUCB Decision Engine</h2>
+      <p class="reveal d3" style="font-size: 28px; margin-bottom: 20px;">Context Vector 22-D يجمع كل المعلومات لاتخاذ القرار الأمثل:</p>
+      <div class="stat-grid reveal d4" style="grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <div class="stat-card" style="padding: 24px 16px;">
+          <div class="number" style="font-size: 36px;">8</div>
+          <div class="label" style="font-size: 18px;">Backend Features<br>T1, T2, RO, CZ, Queue</div>
+        </div>
+        <div class="stat-card" style="padding: 24px 16px;">
+          <div class="number" style="font-size: 36px;">7</div>
+          <div class="label" style="font-size: 18px;">Circuit Q-LEAR<br>Cw, Cd, Gc1q, Gc2q</div>
+        </div>
+        <div class="stat-card" style="padding: 24px 16px;">
+          <div class="number" style="font-size: 36px;">5</div>
+          <div class="label" style="font-size: 18px;">History + Settings<br>Opt Level, Mitigation</div>
+        </div>
+        <div class="stat-card" style="padding: 24px 16px;">
+          <div class="number" style="font-size: 36px;">2</div>
+          <div class="label" style="font-size: 18px;">Environment<br>Kp-norm, Temp</div>
+        </div>
+      </div>
+      <div class="highlight-box reveal d5">
+        <p style="font-size: 26px;"><strong>72 اختيار ممكن:</strong> 3 Backends × 4 Opt Levels × 6 Mitigation Methods</p>
+        <p style="font-size: 26px;"><strong>Reward:</strong> 0.5×Fidelity − 0.2×Time − 0.2×Queue − 0.1×Cost</p>
+      </div>
+      <span class="slide-num">09/20</span>
+    </section>
+
+    <!-- ============ SLIDE 10: LSTM PREDICTOR ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٣</span>
+      <span class="eyebrow reveal d1">DEEP LEARNING COMPONENT</span>
+      <h2 class="reveal d2">LSTM Drift Predictor</h2>
+      <p class="reveal d3" style="color: rgba(255,255,255,0.8);">يتنبأ بصحة الكيوبت المستقبلية ويغذّي NeuralUCB بمعلومات استباقية</p>
+      <div class="flow reveal d4" style="margin-top: 50px;">
+        <div class="flow-box">T1 History<br><small>Sequence = 10</small></div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-box">LSTM Layer<br><small>Hidden = 32</small></div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-box">FC Layer</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-box" style="border-color: var(--accent); border-width: 2px;">Predicted T1<br><small>Next Window</small></div>
+      </div>
+      <div class="highlight-box reveal d5" style="margin-top: 50px;">
+        <p style="font-size: 26px;"><strong>الفائدة:</strong> إذا كانت عاصفة شمسية قادمة بعد 20 دقيقة، LSTM يتنبأ بانخفاض T1 فيقرر NeuralUCB تأجيل التنفيذ أو اختيار Backend أقل تأثراً</p>
+      </div>
+      <span class="slide-num">10/20</span>
+    </section>
+
+    <!-- ============ SLIDE 11: SPACE WEATHER ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٣</span>
+      <span class="eyebrow reveal d1">NOVEL DISCOVERY</span>
+      <h2 class="reveal d2">اكتشاف: تأثير الطقس الفضائي على الكيوبت</h2>
+      <div class="stat-grid reveal d3">
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">−0.197</div>
+          <div class="label">ارتباط T1 مع Kp-index<br>p = 0.00047</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">−0.216</div>
+          <div class="label">ارتباط T1 مع Solar Activity<br>p = 0.0001</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">8.04M</div>
+          <div class="label">سجل تاريخي تم تحليله</div>
+        </div>
+      </div>
+      <div class="highlight-box reveal d4">
+        <p style="font-size: 26px;"><strong>عند Kp > 6 (عاصفة شمسية قوية):</strong> ينخفض T1 بنسبة ~40%<br>هذا أول توثيق لهذه العلاقة في الأدبيات البحثية</p>
+      </div>
+      <span class="slide-num">11/20</span>
+    </section>
+
+    <!-- ============ SLIDE 12: DATASETS ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">DATA SET DESCRIPTION</span>
+      <h2 class="reveal d2">مجموعات البيانات</h2>
+      <table class="comparison-table reveal d3" style="font-size: 24px;">
+        <tr>
+          <th>المصدر</th>
+          <th>الحجم</th>
+          <th>الاستخدام</th>
+        </tr>
+        <tr>
+          <td>Qiskit Calibration Drift</td>
+          <td>8,042,108 rows → 50K sample</td>
+          <td>Training NeuralUCB + LSTM</td>
+        </tr>
+        <tr>
+          <td>IBM Live Calibration</td>
+          <td>3 Backends × 156 Qubits</td>
+          <td>Real-time Context Features</td>
+        </tr>
+        <tr>
+          <td>NOAA Space Weather</td>
+          <td>Live API (every 10 min)</td>
+          <td>Kp-index, Neutron Flux</td>
+        </tr>
+        <tr>
+          <td>S-ZNE Repository</td>
+          <td>100 Qubit Predictions</td>
+          <td>Mitigation Validation</td>
+        </tr>
+        <tr>
+          <td>NVIDIA QCalEval</td>
+          <td>243 Calibration Images</td>
+          <td>Execution Monitoring</td>
+        </tr>
+        <tr>
+          <td>Clifford Training Data</td>
+          <td>100 Ideal vs Noisy Pairs</td>
+          <td>Reward Network Training</td>
+        </tr>
+      </table>
+      <span class="slide-num">12/20</span>
+    </section>
+
+    <!-- ============ SLIDE 13: EVALUATION METRICS ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">EVALUATION METRICS</span>
+      <h2 class="reveal d2">مقاييس التقييم</h2>
+      <div class="stat-grid reveal d3" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="stat-card">
+          <div class="number" style="font-size: 36px;">Fidelity Proxy</div>
+          <div class="label">دقة النتيجة الكمية مقارنة بالمثالية</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 36px;">Cumulative Regret</div>
+          <div class="label">خسارة القرارات مقارنة بالقرار المثالي</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 36px;">Cost Overhead</div>
+          <div class="label">تكلفة التنفيذ (S-ZNE 1.2× vs ZNE 5×)</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 36px;">Training Loss</div>
+          <div class="label">تقارب RewardNet (MSE)</div>
+        </div>
+      </div>
+      <span class="slide-num">13/20</span>
+    </section>
+
+    <!-- ============ SLIDE 14: TRAINING RESULTS ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">RESULTS - TRAINING</span>
+      <h2 class="reveal d2">نتائج التدريب العميق</h2>
+      <div class="stat-grid reveal d3">
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">8,847</div>
+          <div class="label">Contexts مُجمّعة للتدريب</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">0.0028</div>
+          <div class="label">Best Validation Loss<br>(من 0.3224)</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">100</div>
+          <div class="label">Epochs بتقسيم 80/20</div>
+        </div>
+      </div>
+      <div class="highlight-box reveal d4">
+        <p style="font-size: 26px;"><strong>RewardNet:</strong> 22 → 128 → 128 → 1 | Xavier Init | Adam lr=1e-3 | Batch 64<br><strong>LSTM:</strong> seq=10, hidden=32, 50 epochs | drift_lstm.pt (21KB)</p>
+      </div>
+      <span class="slide-num">14/20</span>
+    </section>
+
+    <!-- ============ SLIDE 15: S-ZNE RESULTS ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">RESULTS - COST SAVING</span>
+      <h2 class="reveal d2">S-ZNE: توفير 76% في التكلفة</h2>
+      <div class="bar-chart reveal d3">
+        <div class="bar-item">
+          <div class="bar-value">5.0×</div>
+          <div class="bar" style="height: 280px; background: #ef4444;"></div>
+          <div class="bar-label">ZNE التقليدي<br><small>5 قياسات</small></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-value">3.0×</div>
+          <div class="bar" style="height: 168px; background: #f59e0b;"></div>
+          <div class="bar-label">Richardson</div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-value">1.2×</div>
+          <div class="bar" style="height: 67px; background: linear-gradient(to top, var(--accent), var(--accent-secondary));"></div>
+          <div class="bar-label" style="color: var(--accent); font-weight: 800;">S-ZNE (Ours)<br><small>Constant Overhead</small></div>
+        </div>
+      </div>
+      <div class="highlight-box reveal d4">
+        <p style="font-size: 26px;"><strong>Fidelity محفوظة:</strong> Linear 0.916 = S-ZNE 0.916 | مُثبت على 100 Qubit (Weiyou Liao)</p>
+      </div>
+      <span class="slide-num">15/20</span>
+    </section>
+
+    <!-- ============ SLIDE 16: SPACE WEATHER RESULTS ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">RESULTS - SPACE WEATHER</span>
+      <h2 class="reveal d2">تأثير العواصف الشمسية على الأجهزة</h2>
+      <table class="comparison-table reveal d3" style="font-size: 24px;">
+        <tr>
+          <th>Backend</th>
+          <th>T1 الطبيعي (μs)</th>
+          <th>T1 أثناء Kp≥5 (μs)</th>
+          <th>الانخفاض</th>
+        </tr>
+        <tr>
+          <td>ibm_fez</td>
+          <td>135.6</td>
+          <td>130</td>
+          <td style="color: #ef4444;">−4%</td>
+        </tr>
+        <tr>
+          <td>ibm_torino</td>
+          <td>112</td>
+          <td>67</td>
+          <td style="color: #ef4444;">−40%</td>
+        </tr>
+        <tr>
+          <td>ibm_kingston</td>
+          <td>231</td>
+          <td>251</td>
+          <td style="color: #22c55e;">+8% (أفضل مقاومة)</td>
+        </tr>
+      </table>
+      <div class="highlight-box reveal d4">
+        <p style="font-size: 26px;"><strong>الخلاصة:</strong> NeuralUCB يتعلم أن kingston أفضل خيار أثناء العواصف الشمسية</p>
+      </div>
+      <span class="slide-num">16/20</span>
+    </section>
+
+    <!-- ============ SLIDE 17: MITIGATION COMPARISON ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">RESULTS - MITIGATION</span>
+      <h2 class="reveal d2">مقارنة طرق تخفيف الأخطاء</h2>
+      <table class="comparison-table reveal d3" style="font-size: 24px;">
+        <tr>
+          <th>Method</th>
+          <th>Fidelity</th>
+          <th>Cost</th>
+          <th>T1=50μs</th>
+          <th>T1=231μs</th>
+        </tr>
+        <tr>
+          <td>No Mitigation</td>
+          <td>0.70</td>
+          <td>1.0×</td>
+          <td>0.55</td>
+          <td>0.82</td>
+        </tr>
+        <tr>
+          <td>ZNE Linear</td>
+          <td>0.916</td>
+          <td>5.0×</td>
+          <td>1.167</td>
+          <td>1.046</td>
+        </tr>
+        <tr>
+          <td>ZNE Richardson</td>
+          <td>0.930</td>
+          <td>5.0×</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td style="color: var(--accent); font-weight: 700;">S-ZNE (Ours)</td>
+          <td style="font-weight: 700;">0.916</td>
+          <td style="color: var(--accent); font-weight: 700;">1.2×</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+      </table>
+      <span class="slide-num">17/20</span>
+    </section>
+
+
+
+    <!-- ============ SLIDE 17B: CIRCUIT INPUT DUAL EDITOR ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">USER EXPERIENCE</span>
+      <h2 class="reveal d2">أين يدخل الباحث دائرته؟</h2>
+      <div class="stat-grid reveal d3" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="stat-card">
+          <div class="number" style="font-size: 32px;">QASM 3.0</div>
+          <div class="label">محرر نصي مع تظليل<br>OPENQASM example<br>Bell, VQE, QAOA</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 32px;">Qiskit Python</div>
+          <div class="label">محرر Python بجانبه<br>from qiskit import<br>Bell_Qiskit, VQE_H2_Qiskit</div>
+        </div>
+      </div>
+      <div class="highlight-box reveal d4">
+        <p style="font-size: 26px;"><strong>الميزة:</strong> تبويبين جنب بعض + رفع ملف ذكي يتعرف تلقائياً على اللغة + تحليل Q-LEAR Cw,Cd,Gc1q,Gc2q,Dpe + زر Execute الحقيقي على IBM Quantum</p>
+      </div>
+      <span class="slide-num">17B/25</span>
+    </section>
+
+    <!-- ============ SLIDE 17C: COST DASHBOARD + REAL EXECUTION ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">RESULTS - COST & REAL EXECUTION</span>
+      <h2 class="reveal d2">لوحة التكلفة والتنفيذ الحقيقي على IBM</h2>
+      <div class="stat-grid reveal d3">
+        <div class="stat-card">
+          <div class="number">342.5s</div>
+          <div class="label">إجمالي مع المنصة<br>127 تنفيذ</div>
+        </div>
+        <div class="stat-card" style="background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3);">
+          <div class="number" style="color: #22c55e;">1081.3s</div>
+          <div class="label" style="color: #22c55e;">توفير 76%<br>من S-ZNE</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">1423.8s</div>
+          <div class="label">بدون المنصة<br>ZNE 5×</div>
+        </div>
+      </div>
+      <div class="highlight-box reveal d4">
+        <p style="font-size: 24px;"><strong>Job حقيقي:</strong> d9ac4r4qp3as739v4370 على ibm_kingston 156q • QUEUED 36 دقيقة (طبيعي لـ 156q) • Queue Position #8 • Est Wait 420s • Cost if ZNE 500s vs S-ZNE 120s Saving 380s<br>
+        <strong>Fallback:</strong> Aer Simulator مع NoiseModel حي RO 2.23% CZ 3.33% من fez • Fidelity 0.95 kingston BEST</p>
+      </div>
+      <span class="slide-num">17C/25</span>
+    </section>
+
+    <!-- ============ SLIDE 17D: JOB LIVE MONITOR ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">RESULTS - LIVE MONITORING</span>
+      <h2 class="reveal d2">شاشة متابعة Job الحية</h2>
+      <div class="flow reveal d3">
+        <div class="flow-box">QUEUED<br><small>طابور #8</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">RUNNING<br><small>1.5s</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box" style="border-color: #22c55e;">COMPLETED<br><small>Counts: 00:512</small></div>
+      </div>
+      <ul>
+        <li class="step"><strong>Overall Progress Bar:</strong> 20% → 70% → 100% - شريط كبير 8px</li>
+        <li class="step"><strong>Queue Progress:</strong> أصفر #f1c21b - يعرض queue_position و estimated_queue_seconds</li>
+        <li class="step"><strong>Execution Progress:</strong> أزرق #0f62fe + Fidelity 95% Backend T1 231us BEST</li>
+        <li class="step"><strong>Polling كل 3 ثواني:</strong> GET /api/v1/jobs/{job_id} + Bilingual في الطابور/قيد التنفيذ/مكتمل</li>
+      </ul>
+      <span class="slide-num">17D/25</span>
+    </section>
+
+    <!-- ============ SLIDE 17E: PROFESSIONAL UI ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">USER EXPERIENCE - PROFESSIONAL UI</span>
+      <h2 class="reveal d2">واجهة احترافية ثنائية اللغة بمستوى شركات عالمية</h2>
+      <ul>
+        <li class="step"><strong>خلفية:</strong> background.png ثابتة للصفحة كلها opacity 0.80 للصفحة كلها + Overlay 20%-45% للقراءة</li>
+        <li class="step"><strong>شعار:</strong> logo.png 72px شبه دائري borderRadius 20px + 40px في Header borderRadius 12px - تم تعديل الملف نفسه ليكون دائري وليس CSS فقط</li>
+        <li class="step"><strong>كروت:</strong> شفافية 30% rgba(18,20,31,0.70) blur 20px + بدون تداخل صور - تم إصلاح تداخل 350px watermark فوق 90px شعار</li>
+        <li class="step"><strong>ثنائية اللغة:</strong> LanguageContext AR/EN كامل + زر 🌐 + dir rtl/ltr + خط Tajawal للعربي + إزالة الرموز ⭐🌐✅ في النسخة الأكاديمية الإنجليزية فقط</li>
+        <li class="step"><strong>Build:</strong> Route / 5.08kB First Load 85.9kB Compiled successfully - Vercel 100% بدون فيزا</li>
+      </ul>
+      <span class="slide-num">17E/25</span>
+    </section>
+
+    <!-- ============ SLIDE 17F: DRIFT TRANSFORMER ENSEMBLE ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">DEEP LEARNING - STRENGTHENING</span>
+      <h2 class="reveal d2">Drift Transformer Ensemble - تقوية LSTM وليس استبدال NeuralUCB</h2>
+      <p class="reveal d3" style="font-size: 28px; color: color-mix(in srgb, var(--foreground) 70%, transparent);">لا تستبدل، ادمج الاثنين: LSTM يتنبأ قصير المدى 10-20 دقيقة + Transformer طويل المدى 30-60 دقيقة مع Attention</p>
+      <div class="flow reveal d4">
+        <div class="flow-box">T1/T2 + Kp + Neutron<br><small>8 Features</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">LSTM 10-20min<br><small>21KB</small></div>
+        <span class="flow-arrow">+</span>
+        <div class="flow-box">Transformer 30-60min<br><small>1.5MB Attention</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box" style="border-color: var(--accent);">Ensemble 1.6MB<br><small>0.49 + 0.51</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">Future T1 → NeuralUCB</div>
+      </div>
+      <div class="highlight-box reveal d5">
+        <p style="font-size: 24px;"><strong>النتائج:</strong> Transformer val loss 0.1548 أفضل من LSTM 0.99، Ensemble val 0.1215 weights LSTM 0.49 Transformer 0.51 - لماذا أقوى؟ بدون تنبؤ: NeuralUCB يرى الحالي فقط → قرار خاطئ لو عاصفة جاية بعد 20 دقيقة، مع تنبؤ: يرى الحالي+المستقبلي → يقرر تأجيل 45 دقيقة</p>
+      </div>
+      <span class="slide-num">17F/25</span>
+    </section>
+
+    <!-- ============ SLIDE 17G: UNCERTAINTY ESTIMATION ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">EXPLAINABILITY - UNCERTAINTY</span>
+      <h2 class="reveal d2">تقدير عدم اليقين وشرح Attention Weights</h2>
+      <p class="reveal d3" style="color: rgba(255,255,255,0.8);">يوضح أي نقطة زمنية وأي ميزة بيئية أثرت أكثر في التنبؤ</p>
+      <div class="stat-grid reveal d4" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="stat-card">
+          <div class="number" style="font-size: 36px;">45.2µs</div>
+          <div class="label">Prediction<br>Future T1</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 36px;">±8.3µs</div>
+          <div class="label">Uncertainty<br>84.2% Confidence</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 24px;">Kp 0.28<br>t-2 0.22</div>
+          <div class="label">Top Feature<br>Top Time</div>
+        </div>
+      </div>
+      <div class="highlight-box reveal d5">
+        <p style="font-size: 24px;"><strong>التفسير البشري:</strong> Model predicts future T1 = 45.2us ±8.3us (confidence 84.2%). Most important feature: Kp (0.28) - Geomagnetic storm. Most attended time: t-2 (0.22) - Kp spike 2 steps ago strongly influences future T1 drop - indicating incoming solar storm will affect qubit.<br>
+        <strong>Attention Weights:</strong> [batch=1, nhead=4, seq=10, seq=10] - Each head attends to different time patterns. For last prediction (t=0), attention from t=0 to all past t-9..t-0 shows which past moments influenced future.</p>
+      </div>
+      <span class="slide-num">17G/25</span>
+    </section>
+
+    <!-- ============ SLIDE 17H: DEPLOYMENT - DETA, RENDER, VERCEL, GITHUB ============ -->
+    <section class="slide light-slide">
+      <span class="speaker-tag reveal d1">المقدم ٤</span>
+      <span class="eyebrow reveal d1">DEPLOYMENT - PRODUCTION READY</span>
+      <h2 class="reveal d2">النشر الإنتاجي: Docker + Vercel 100% بدون فيزا</h2>
+      <ul>
+        <li class="step"><strong>المشكلة:</strong> Render يطلب فيزا (Your card was declined) - Koyeb يطلب فيزا - HuggingFace Docker يطلب PRO $9 - Deta Space واقع DNS Error 1016</li>
+        <li class="step"><strong>الحل:</strong> Vercel 100% بدون مواقع تانية: frontend/package.json @vercel/next + api/index.py @vercel/python lightweight بدون torch/qiskit (0GB local) - Endpoints: /api/v1/health, /backends live fez 135.6us, /spaceweather/live NOAA kp 2.0 live + neutron 94.6, /copilot/plan AR/EN, /generate, /mitigation/compare, /jobs/{job_id} progress bars - Both frontend+backend on same domain https://quantumpilot-ai.vercel.app (مجاني بدون فيزا بدون PRO)</li>
+        <li class="step"><strong>Docker Prod 6 Services:</strong> postgres:15-alpine, redis:7-alpine, rabbitmq:3-management-alpine, backend Python 3.11-slim with torch CPU + mitiq + healthcheck, celery-worker, celery-beat every 10m SpaceWeather LIVE NOAA + 1h refresh_calibration + 30m predict_drift, frontend Node 20-alpine - One command docker-compose -f docker-compose.prod.yml up --build -d - .env.example with IBM_TOKEN, IBM_CRN, HF_TOKEN</li>
+        <li class="step"><strong>CI/CD:</strong> .github/workflows/ci.yml 5 jobs lint black/isort/ruff, test postgres+redis, docs-check 20 files, research-validation drift_50k 1.8M + clifford 100 + reward_net_deep 80K, security-scan bandit+gitleaks, docker-build-test - SUCCESS after 3 fixes</li>
+        <li class="step"><strong>Live Demo URLs:</strong> Frontend Vercel https://quantumpilot-ai.vercel.app + GitHub Codespaces https://legendary-tribble-pjw777pq9x7xf6w75-3000.app.github.dev/ with full Docker 6 services</li>
+      </ul>
+      <span class="slide-num">17H/25</span>
+    </section>
+
+    <!-- ============ SLIDE 17I: GRANITE SIZE ANALYSIS ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٥</span>
+      <span class="eyebrow reveal d1">AI CODE ASSISTANT - SIZE ANALYSIS</span>
+      <h2 class="reveal d2">Granite-8B: هل مساحته كبيرة؟</h2>
+      <div class="stat-grid reveal d3">
+        <div class="stat-card">
+          <div class="number">16GB</div>
+          <div class="label">FP16 Original<br>3x safetensors<br>8B params</div>
+        </div>
+        <div class="stat-card" style="border-color: #22c55e;">
+          <div class="number" style="color: #22c55e;">4.9GB</div>
+          <div class="label">Q4_K_M GGUF<br>Recommended local<br>44% HumanEval</div>
+        </div>
+        <div class="stat-card" style="border-color: var(--accent);">
+          <div class="number" style="color: var(--accent);">0GB</div>
+          <div class="label">API Mock<br>Our Solution<br>46.5% HumanEval</div>
+        </div>
+      </div>
+      <div class="highlight-box reveal d4">
+        <p style="font-size: 26px;"><strong>الحل في QuantumPilot AI:</strong> HF Inference API 0GB local + Mock fallback (Bell, VQE H2, QAOA) + Endpoints /generate + /granite/status - No local storage, free tier, same accuracy 46.5% - For production offline: GGUF Q4_K_M 4.9GB with Ollama</p>
+      </div>
+      <span class="slide-num">17I/25</span>
+    </section>
+
+
+    <!-- ============ SLIDE 18: FUTURE WORK ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٥</span>
+      <span class="eyebrow reveal d1">FUTURE WORK</span>
+      <h2 class="reveal d2">العمل المستقبلي</h2>
+      <ul>
+        <li class="step"><strong>Real IBM Execution:</strong> تنفيذ فعلي على أجهزة IBM مع A/B testing ضد least_busy</li>
+        <li class="step"><strong>NLP Copilot:</strong> مساعد ثنائي اللغة يقبل أوامر طبيعية ("نفّذ بأقل تكلفة")</li>
+        <li class="step"><strong>Transformer Predictor:</strong> استبدال LSTM بـ Transformer لتنبؤ أدق</li>
+        <li class="step"><strong>Knowledge Graph:</strong> تعلم مستمر من كل عملية تنفيذ</li>
+        <li class="step"><strong>Federated Learning:</strong> التعلم عبر مؤسسات متعددة دون مشاركة بيانات</li>
+      </ul>
+      <span class="slide-num">18/20</span>
+    </section>
+
+    <!-- ============ SLIDE 19: CONCLUSION ============ -->
+    <section class="slide light-slide" style="align-items: center; text-align: center;">
+      <span class="speaker-tag reveal d1">المقدم ٥</span>
+      <span class="eyebrow reveal d1">CONCLUSION</span>
+      <h2 class="reveal d2">الخلاصة: 4 مساهمات رئيسية</h2>
+      <div class="stat-grid reveal d3" style="grid-template-columns: repeat(2, 1fr); max-width: 1200px;">
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">🧠</div>
+          <div class="label" style="font-size: 24px;">أول NeuralUCB<br>للحوسبة الكمية</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">🌞</div>
+          <div class="label" style="font-size: 24px;">أول ربط موثق<br>Space Weather + Qubit</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">💰</div>
+          <div class="label" style="font-size: 24px;">توفير 76%<br>عبر S-ZNE</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="font-size: 48px;">📈</div>
+          <div class="label" style="font-size: 24px;">LSTM Predictor<br>للتنبؤ بتدهور T1</div>
+        </div>
+      </div>
+      <span class="slide-num">19/20</span>
+    </section>
+
+    <!-- ============ SLIDE 20: REFERENCES + Q&A ============ -->
+    <section class="slide dark-slide">
+      <span class="speaker-tag reveal d1">المقدم ٥</span>
+      <span class="eyebrow reveal d1">REFERENCES</span>
+      <h2 class="reveal d2">المراجع</h2>
+      <ol class="ref-list reveal d3" style="color: rgba(255,255,255,0.7);">
+        <li>[1] Zhou, D. et al. "Neural Contextual Bandits with UCB-based Exploration." ICML 2020.</li>
+        <li>[2] Liao, W. et al. "Sample-efficient QEM via Classical Surrogates." arXiv 2024.</li>
+        <li>[3] Kim, Y. et al. "Evidence for utility of quantum computing before fault tolerance." Nature 2023.</li>
+        <li>[4] Temme, K. et al. "Error mitigation for short-depth quantum circuits." PRL 2017.</li>
+        <li>[5] Endo, S. et al. "Practical quantum error mitigation." PRX 2018.</li>
+        <li>[6] Czarnik, P. et al. "Error mitigation with Clifford quantum-circuit data." Quantum 2021.</li>
+        <li>[7] Qiskit Contributors. "Qiskit Runtime primitives." IBM Research 2024.</li>
+        <li>[8] NOAA. "Planetary K-index monitoring." SWPC 2026.</li>
+        <li>[9] Q-LEAR. "Quantum Layout-aware Error Assessment." IEEE QCE 2023.</li>
+        <li>[10] Mari, A. et al. "Extending quantum probabilistic error cancellation." PRA 2021.</li>
+      </ol>
+      <span class="slide-num">20/20</span>
+    </section>
+
+</body>
+</html>

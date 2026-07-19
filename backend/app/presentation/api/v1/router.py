@@ -27,7 +27,8 @@ def health():
 @router.get("/backends")
 def list_backends():
     from ....infrastructure.qiskit.backend_repository import QiskitBackendRepository
-    repo = QiskitBackendRepository(dataset_root="/home/user/QuantumPilot-AI/datasets")
+    from ....core.config.settings import settings
+    repo = QiskitBackendRepository(dataset_root=settings.DATASET_ROOT)
     calibrations = repo.get_live_backends()
     return [{"backend_name": c.backend_name, "num_qubits": c.num_qubits, "T1_mean": c.T1_mean, "T2_mean": c.T2_mean, "readout_error_mean": c.readout_error_mean} for c in calibrations]
 
@@ -183,7 +184,8 @@ def make_decision(req: CircuitRequest):
     analyzer = CircuitAnalyzer()
     profile = analyzer.analyze_qasm(req.qasm) if req.qasm else analyzer.analyze_qiskit_code(req.qiskit_code or "")
     
-    backend_repo = QiskitBackendRepository(dataset_root="/home/user/QuantumPilot-AI/datasets")
+    from ....core.config.settings import settings
+    backend_repo = QiskitBackendRepository(dataset_root=settings.DATASET_ROOT)
     backends = backend_repo.get_live_backends()
     if not backends:
         raise HTTPException(400, "No backends calibration found - run calibration fetcher")
@@ -267,6 +269,12 @@ def execute_real_circuit(req: dict):
         mitigation=mitigation
     )
     return result
+
+@router.get("/jobs/{job_id}")
+def get_job_status(job_id: str):
+    from ....infrastructure.qiskit.execution_service import IBMExecutionService
+    service = IBMExecutionService()
+    return service.get_job_status(job_id)
 
 @router.get("/execute/{execution_id}")
 def get_execution_status(execution_id: str):

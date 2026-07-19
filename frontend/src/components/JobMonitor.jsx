@@ -40,15 +40,15 @@ export default function JobMonitor({ jobId, initialData }) {
           setJobStatus({
             job_id: jobId,
             backend_name: initialData?.backend_name || 'ibm_kingston',
-            status: mock.status,
-            queue_position: mock.queue_position,
-            estimated_queue_seconds: 120,
-            execution_time_seconds: mock.status === 'RUNNING' ? 1.5 : mock.status === 'COMPLETED' ? 2.8 : 0,
-            is_simulated: true,
-            progress: mock.progress,
-            counts: mock.status === 'COMPLETED' ? { '00': 512, '11': 498, '01': 8, '10': 6 } : null,
-            fidelity: mock.status === 'COMPLETED' ? 0.95 : null,
-            message: `Mock job ${jobId} - ${mock.status}`
+            status: initialData?.status || mock.status,
+            queue_position: initialData?.queue_position ?? mock.queue_position,
+            estimated_queue_seconds: initialData?.estimated_queue_seconds ?? 120,
+            execution_time_seconds: initialData?.execution_time_seconds ?? (mock.status === 'RUNNING' ? 1.5 : mock.status === 'COMPLETED' ? 2.8 : 0),
+            is_simulated: initialData?.is_simulated ?? true,
+            progress: initialData?.progress || mock.progress,
+            counts: initialData?.counts ?? (mock.status === 'COMPLETED' ? { '00': 512, '11': 498, '01': 8, '10': 6 } : null),
+            fidelity: initialData?.fidelity ?? (mock.status === 'COMPLETED' ? 0.95 : null),
+            message: initialData?.message || `Mock job ${jobId} - ${mock.status}`
           })
           if (mock.status === 'COMPLETED') setPolling(false)
         }
@@ -177,7 +177,7 @@ export default function JobMonitor({ jobId, initialData }) {
             }} />
           </div>
           <div style={{ fontSize: 10, color: '#6f6f6f', marginTop: 4 }}>
-            {jobStatus.execution_time_seconds ? `${jobStatus.execution_time_seconds.toFixed(1)}s` : (locale==='ar' ? 'في الانتظار' : 'Waiting')}
+            {typeof jobStatus.execution_time_seconds === 'number' ? `${jobStatus.execution_time_seconds.toFixed(1)}s` : (locale==='ar' ? 'في الانتظار' : 'Waiting')}
           </div>
         </div>
       </div>
@@ -189,12 +189,15 @@ export default function JobMonitor({ jobId, initialData }) {
           </div>
           <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#c6c6c6', background: '#0a0e1a', padding: 8, borderRadius: 4 }}>
             Counts: {JSON.stringify(jobStatus.counts)}<br/>
-            Fidelity: {(jobStatus.fidelity*100).toFixed(1)}% • Backend: {jobStatus.backend_name} • T1 231us BEST
+            Fidelity: {(((jobStatus.fidelity ?? 0) * 100)).toFixed(1)}% • Backend: {jobStatus.backend_name || 'n/a'} • T1 231us BEST
           </div>
         </div>
       )}
 
       <div style={{ fontSize: 11, color: '#6f6f6f', background: '#0a0e1a', padding: 8, borderRadius: 4 }}>
+        <div style={{ marginBottom: 6, padding: '6px 8px', borderRadius: 4, fontSize: 10, fontWeight: 600, background: jobStatus.is_simulated ? 'rgba(241, 194, 27, 0.14)' : 'rgba(15, 98, 254, 0.14)', color: jobStatus.is_simulated ? '#f1c21b' : '#0f62fe', border: `1px solid ${jobStatus.is_simulated ? 'rgba(241,194,27,0.25)' : 'rgba(15,98,254,0.25)'}` }}>
+          {jobStatus.is_simulated ? (locale==='ar' ? 'وضع Job: محاكاة محلية' : 'Job mode: Local simulation') : (locale==='ar' ? 'وضع Job: إرسال حقيقي إلى IBM Quantum' : 'Job mode: Real submission to IBM Quantum')}
+        </div>
         {jobStatus.message || (locale==='ar' ? 'Job حقيقي على IBM Quantum - Job ID حقيقي مثل d9ac4r4qp3as739v4370 الذي أرسلناه على ibm_kingston 156q' : 'Real IBM job - Job ID like d9ac4r4qp3as739v4370 we sent to ibm_kingston 156q')}
         <br/>
         {polling ? (locale==='ar' ? 'يحدث كل 3 ثواني...' : 'Polling every 3s...') : (locale==='ar' ? 'اكتمل التتبع' : 'Monitoring completed')}
